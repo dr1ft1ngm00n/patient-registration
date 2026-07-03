@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Patient Lookup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF6F0;
+    --panel: #FFFFFF;
+    --ink: #2B2B28;
+    --ink-soft: #6B6962;
+    --sage: #3D5A4C;
+    --sage-light: #E8EDE6;
+    --clay: #C97B5A;
+    --clay-soft: #F3E3DA;
+    --line: #E4DFD5;
+    --error: #B3452F;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+  }
+
+  .eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sage);
+    font-weight: 600;
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 30px;
+    margin: 0 0 12px;
+  }
+
+  .intro p {
+    color: var(--ink-soft);
+    font-size: 15px;
+    margin: 0 0 28px;
+  }
+
+  .search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  input[type="number"] {
+    flex: 1;
+    padding: 11px 13px;
+    font-size: 15px;
+    font-family: inherit;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+  }
+
+  input[type="number"]:focus {
+    outline: none;
+    border-color: var(--clay);
+    box-shadow: 0 0 0 3px var(--clay-soft);
+  }
+
+  button {
+    padding: 11px 22px;
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--sage);
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+  }
+
+  button:hover { background: #324c40; }
+
+  .result-card {
+    display: none;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px 26px;
+  }
+  .result-card.show { display: block; }
+
+  .result-name {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 16px;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    row-gap: 10px;
+    font-size: 14.5px;
+  }
+
+  .result-grid dt {
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .result-grid dd { margin: 0; }
+
+  .status-banner {
+    display: none;
+    margin-top: 4px;
+    margin-bottom: 24px;
+    padding: 14px 16px;
+    border-radius: var(--radius);
+    font-size: 14px;
+  }
+  .status-banner.show { display: block; }
+  .status-banner.error {
+    background: var(--clay-soft);
+    color: var(--error);
+    border: 1px solid #e6c4b5;
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="eyebrow">Staff Lookup</div>
+    <h1>Find a patient</h1>
+    <div class="intro">
+      <p>Enter a patient ID to view their basic record.</p>
+    </div>
+
+    <div class="search-row">
+      <input type="number" id="patientIdInput" placeholder="Patient ID, e.g. 12" min="1" />
+      <button id="lookupButton">Search</button>
+    </div>
+
+    <div class="status-banner" id="statusBanner"></div>
+
+    <div class="result-card" id="resultCard">
+      <p class="result-name" id="resultName"></p>
+      <dl class="result-grid">
+        <dt>Patient ID</dt>
+        <dd id="resultId"></dd>
+        <dt>Age</dt>
+        <dd id="resultAge"></dd>
+        <dt>Gender</dt>
+        <dd id="resultGender"></dd>
+      </dl>
+    </div>
+  </div>
+
+  <script src="lookup.js"></script>
+</body>
+</html>

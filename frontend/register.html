@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Patient Registration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF6F0;
+    --panel: #FFFFFF;
+    --ink: #2B2B28;
+    --ink-soft: #6B6962;
+    --sage: #3D5A4C;
+    --sage-light: #E8EDE6;
+    --clay: #C97B5A;
+    --clay-soft: #F3E3DA;
+    --line: #E4DFD5;
+    --error: #B3452F;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+  }
+
+  header.intro {
+    margin-bottom: 36px;
+  }
+
+  .eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sage);
+    font-weight: 600;
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 34px;
+    line-height: 1.15;
+    margin: 0 0 12px;
+    color: var(--ink);
+  }
+
+  .intro p {
+    color: var(--ink-soft);
+    font-size: 15.5px;
+    margin: 0;
+    max-width: 46ch;
+  }
+
+  /* Progress indicator */
+  .progress {
+    display: flex;
+    gap: 6px;
+    margin: 28px 0 0;
+  }
+  .progress-segment {
+    flex: 1;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--line);
+    transition: background 0.3s ease;
+  }
+  .progress-segment.active { background: var(--sage); }
+
+  form { margin-top: 8px; }
+
+  fieldset {
+    border: none;
+    margin: 0 0 28px;
+    padding: 28px 28px 8px;
+    background: var(--panel);
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+  }
+
+  legend {
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    font-weight: 500;
+    padding: 0 0 18px;
+    color: var(--sage);
+  }
+
+  .field {
+    margin-bottom: 18px;
+  }
+
+  .field:last-child { margin-bottom: 4px; }
+
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  label {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .optional-tag {
+    color: var(--ink-soft);
+    font-weight: 400;
+    font-size: 12.5px;
+  }
+
+  input {
+    width: 100%;
+    padding: 11px 13px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--clay);
+    box-shadow: 0 0 0 3px var(--clay-soft);
+  }
+
+  input.invalid {
+    border-color: var(--error);
+  }
+
+  .field-error {
+    font-size: 12.5px;
+    color: var(--error);
+    margin-top: 5px;
+    min-height: 0;
+  }
+
+  .help-text {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-top: 5px;
+  }
+
+  button[type="submit"] {
+    width: 100%;
+    padding: 15px;
+    font-family: inherit;
+    font-size: 15.5px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--sage);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+
+  button[type="submit"]:hover { background: #324c40; }
+  button[type="submit"]:active { transform: scale(0.99); }
+  button[type="submit"]:disabled {
+    background: var(--line);
+    color: var(--ink-soft);
+    cursor: not-allowed;
+  }
+
+  .status-banner {
+    display: none;
+    margin-top: 20px;
+    padding: 16px 18px;
+    border-radius: var(--radius);
+    font-size: 14.5px;
+  }
+  .status-banner.show { display: block; }
+  .status-banner.success {
+    background: var(--sage-light);
+    color: var(--sage);
+    border: 1px solid #c7d6cd;
+  }
+  .status-banner.error {
+    background: var(--clay-soft);
+    color: var(--error);
+    border: 1px solid #e6c4b5;
+  }
+  .status-banner strong { display: block; margin-bottom: 4px; font-weight: 600; }
+
+  @media (max-width: 520px) {
+    .row-2 { grid-template-columns: 1fr; }
+    h1 { font-size: 28px; }
+    fieldset { padding: 22px 18px 6px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="intro">
+      <p class="eyebrow">New Patient</p>
+      <h1>Let's get you registered</h1>
+      <p>This takes about three minutes. Everything you enter is validated and stored securely — you can leave anything marked optional blank.</p>
+      <div class="progress" id="progressBar">
+        <div class="progress-segment active" data-section="0"></div>
+        <div class="progress-segment" data-section="1"></div>
+        <div class="progress-segment" data-section="2"></div>
+        <div class="progress-segment" data-section="3"></div>
+      </div>
+    </header>
+
+    <form id="registrationForm" novalidate>
+      <fieldset data-section="0">
+        <legend>About you</legend>
+        <div class="row-2">
+          <div class="field">
+            <label for="firstName">First name</label>
+            <input id="firstName" name="firstName" required />
+            <div class="field-error" data-error-for="firstName"></div>
+          </div>
+          <div class="field">
+            <label for="lastName">Last name</label>
+            <input id="lastName" name="lastName" required />
+            <div class="field-error" data-error-for="lastName"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="dateOfBirth">Date of birth</label>
+          <input id="dateOfBirth" name="dateOfBirth" type="date" required />
+          <div class="field-error" data-error-for="dateOfBirth"></div>
+        </div>
+        <div class="field">
+          <label for="gender">Gender <span class="optional-tag">(optional)</span></label>
+          <input id="gender" name="gender" placeholder="e.g. Female, Male, Non-binary" />
+        </div>
+      </fieldset>
+
+      <fieldset data-section="1">
+        <legend>Contact details</legend>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required />
+          <div class="field-error" data-error-for="email"></div>
+        </div>
+        
+</div>
+        <div class="field">
+          <label for="phone">Phone number</label>
+          <input id="phone" name="phone" type="tel" placeholder="55523 54567" required />
+          <div class="field-error" data-error-for="phone"></div>
+        </div>
+      </fieldset>
+
+      <fieldset data-section="2">
+        <legend>Home address</legend>
+        <div class="field">
+          <label for="addressLine1">Address line 1</label>
+          <input id="addressLine1" name="addressLine1" required />
+          <div class="field-error" data-error-for="addressLine1"></div>
+        </div>
+        <div class="field">
+          <label for="addressLine2">Address line 2 <span class="optional-tag">(optional)</span></label>
+          <input id="addressLine2" name="addressLine2" placeholder="Apartment, suite, unit" />
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="city">City</label>
+            <input id="city" name="city" required />
+            <div class="field-error" data-error-for="city"></div>
+          </div>
+          <div class="field">
+            <label for="state">State / Province</label>
+            <input id="state" name="state" required />
+            <div class="field-error" data-error-for="state"></div>
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="postalCode">Postal code</label>
+            <input id="postalCode" name="postalCode" required />
+            <div class="field-error" data-error-for="postalCode"></div>
+          </div>
+          <div class="field">
+            <label for="country">Country</label>
+            <input id="country" name="country" required />
+            <div class="field-error" data-error-for="country"></div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset data-section="3">
+        <legend>Insurance</legend>
+        <div class="field">
+          <label for="insuranceProvider">Insurance provider</label>
+          <input id="insuranceProvider" name="insuranceProvider" required />
+          <div class="field-error" data-error-for="insuranceProvider"></div>
+        </div>
+        <div class="field">
+          <label for="insuranceMemberId">Member ID</label>
+          <input id="insuranceMemberId" name="insuranceMemberId" placeholder="Letters, numbers, and hyphens" required />
+          <div class="field-error" data-error-for="insuranceMemberId"></div>
+        </div>
+      </fieldset>
+
+      <button type="submit" id="submitButton">Complete registration</button>
+
+      <div class="status-banner" id="statusBanner"></div>
+    </form>
+  </div>
+
+  <script src="register.js"></script>
+</body>
+</html>

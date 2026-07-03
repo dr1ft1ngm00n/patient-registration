@@ -1,0 +1,16 @@
+{
+  "firstName": "Alice",
+  "lastName": "Anderson",
+  "dateOfBirth": "1990-01-01",
+  "gender": "Female",
+  "email": "alice@example.com",
+  "password": "AlicePass123",
+  "phone": "+15551112222",
+  "addressLine1": "1 First St",
+  "city": "Springfield",
+  "state": "IL",
+  "postalCode": "62704",
+  "country": "USA",
+  "insuranceProvider": "Acme Health",
+  "insuranceMemberId": "ALICE123"
+}

@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Patient {
+  id        Int      @id @default(autoincrement())
+
+  firstName String
+  lastName  String
+  dateOfBirth DateTime
+  gender    String?
+  genderId  Int?
+  genderRef GenderMaster? @relation(fields: [genderId], references: [id])
+
+  email     String   @unique
+  phone     String
+
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  state        String
+  postalCode   String
+  country      String
+
+  insuranceProvider String
+  insuranceMemberId String @db.VarChar(255)
+
+  createdAt    DateTime @default(now())
+  appointments Appointment[]
+  bills        Bill[]
+}
+
+enum Role {
+  ADMIN
+  RECEPTIONIST
+  DOCTOR
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  role         Role
+  fullName     String
+
+  createdAt    DateTime @default(now())
+}
+
+model GenderMaster {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+
+  patients  Patient[]
+}
+
+model Appointment {
+  id          Int      @id @default(autoincrement())
+  patientId   Int
+  patient     Patient  @relation(fields: [patientId], references: [id])
+  doctorName  String
+  dateTime    DateTime
+  status      AppointmentStatus @default(SCHEDULED)
+  createdAt   DateTime @default(now())
+
+  bills       Bill[]
+}
+
+model Bill {
+  id                 Int           @id @default(autoincrement())
+  patientId          Int
+  patient            Patient       @relation(fields: [patientId], references: [id])
+  appointmentId      Int?
+  appointment        Appointment?  @relation(fields: [appointmentId], references: [id])
+  serviceDescription String
+  amount             Decimal       @db.Decimal(10, 2)
+  paymentStatus      PaymentStatus @default(PENDING)
+  createdAt          DateTime      @default(now())
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  CANCELLED
+}

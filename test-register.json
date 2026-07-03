@@ -1,0 +1,14 @@
+{
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "dateOfBirth": "1990-05-15",
+  "email": "test-audit-002@example.com",
+  "phone": "+15551234567",
+  "addressLine1": "123 Main St",
+  "city": "Springfield",
+  "state": "IL",
+  "postalCode": "62704",
+  "country": "USA",
+  "insuranceProvider": "Acme Health",
+  "insuranceMemberId": "ABC123456"
+}

@@ -1,0 +1,27 @@
+# Start from the official Node.js 20 image (slim = smaller, no unnecessary tools)
+FROM node:20-slim
+
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
+# Create a working directory inside the container
+WORKDIR /app
+
+# Copy package files first — this is a Docker best practice:
+# if your code changes but dependencies don't, Docker reuses the cached
+# npm install layer instead of re-running it every time. Saves time.
+COPY backend/package*.json ./
+
+# Install dependencies
+RUN npm install --production
+
+# Copy the rest of the backend code
+COPY backend/ ./
+
+# Generate Prisma client inside the container
+RUN npx prisma generate
+
+# Expose the port your server runs on
+EXPOSE 3001
+
+# Start the server
+CMD ["node", "server.js"]

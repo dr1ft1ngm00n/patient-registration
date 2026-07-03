@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Staff Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F4F1EC; --panel: #FFFFFF; --ink: #2B2B28; --ink-soft: #6B6962;
+    --sage: #3D5A4C; --sage-dark: #2A3F35; --clay: #C97B5A; --clay-soft: #F3E3DA;
+    --line: #DAD5C9; --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif; line-height: 1.5;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 24px;
+  }
+  .wrap { max-width: 460px; width: 100%; text-align: center; }
+  .eyebrow {
+    font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--sage-dark); font-weight: 600; margin: 0 0 12px;
+  }
+  h1 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 34px; margin: 0 0 14px; }
+  .subtext { color: var(--ink-soft); font-size: 15.5px; margin: 0 0 40px; }
+  .actions { display: flex; flex-direction: column; gap: 14px; }
+  .action-card {
+    display: block; text-decoration: none; color: var(--ink);
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 22px 24px; text-align: left;
+    transition: border-color 0.15s ease, transform 0.1s ease;
+  }
+  .action-card:hover { border-color: var(--clay); transform: translateY(-1px); }
+  .action-card.primary { background: var(--sage-dark); border-color: var(--sage-dark); color: #fff; }
+  .action-title { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 500; margin: 0 0 4px; }
+  .action-desc { font-size: 13.5px; opacity: 0.85; margin: 0; }
+  .note {
+    margin-top: 32px; font-size: 12.5px; color: var(--ink-soft);
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 12px 16px;
+  }
+  .patient-link {
+    display: inline-block; margin-top: 20px; font-size: 13px;
+    color: var(--ink-soft); text-decoration: none;
+  }
+  .patient-link:hover { color: var(--sage-dark); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">Staff Area</div>
+    <h1>Staff Portal</h1>
+    <p class="subtext">For Admin, Receptionist, and Doctor accounts.</p>
+
+    <div class="actions">
+      <a href="/login.html" class="action-card primary">
+        <p class="action-title">Sign in</p>
+        <p class="action-desc">Access patient records and tools.</p>
+      </a>
+    </div>
+
+    <p class="note">Staff accounts are created internally and aren't self-service. Contact an administrator if you need access.</p>
+
+    <a href="/index.html" class="patient-link">← Looking for the patient portal?</a>
+  </div>
+</body>
+</html>

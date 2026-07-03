@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Staff Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF6F0; --panel: #FFFFFF; --ink: #2B2B28; --ink-soft: #6B6962;
+    --sage: #3D5A4C; --clay: #C97B5A; --clay-soft: #F3E3DA;
+    --line: #E4DFD5; --error: #B3452F; --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh;
+  }
+  .card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 36px 32px; width: 100%; max-width: 380px;
+  }
+  .eyebrow {
+    font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--sage); font-weight: 600; margin: 0 0 10px;
+  }
+  h1 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 26px; margin: 0 0 24px; }
+  label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
+  .field { margin-bottom: 16px; }
+  input {
+    width: 100%; padding: 11px 13px; font-size: 15px; font-family: inherit;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 7px;
+  }
+  input:focus {
+    outline: none; border-color: var(--clay); box-shadow: 0 0 0 3px var(--clay-soft);
+  }
+  button {
+    width: 100%; padding: 13px; margin-top: 8px; font-family: inherit;
+    font-size: 15px; font-weight: 600; color: #fff; background: var(--sage);
+    border: none; border-radius: 8px; cursor: pointer;
+  }
+  button:hover { background: #324c40; }
+  button:disabled { background: var(--line); color: var(--ink-soft); }
+  .status-banner {
+    display: none; margin-top: 16px; padding: 12px 14px;
+    border-radius: var(--radius); font-size: 13.5px;
+  }
+  .status-banner.show { display: block; background: var(--clay-soft); color: var(--error); border: 1px solid #e6c4b5; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="eyebrow">Staff Access</div>
+    <h1>Sign in</h1>
+    <form id="loginForm">
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" required />
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required />
+      </div>
+      <button type="submit" id="loginButton">Sign in</button>
+      <div class="status-banner" id="statusBanner"></div>
+    </form>
+  </div>
+  <script src="login.js"></script>
+</body>
+</html>

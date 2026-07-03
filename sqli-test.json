@@ -1,0 +1,4 @@
+{
+  "email": "alice@example.com' OR '1'='1",
+  "password": "anything"
+}
