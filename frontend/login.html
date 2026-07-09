@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hospital Information System (HIS)</title>
+    <title>Staff Portal Login</title>
     <style>
         :root {
             --primary: #2b6cb0;
@@ -15,24 +15,37 @@
             --error: #e53e3e;
             --success: #38a169;
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
-        .container { max-width: 800px; margin: 40px auto; background: var(--surface); padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        
-        h2 { margin-bottom: 20px; color: var(--primary-dark); border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 450px; margin: 60px auto; background: var(--surface); padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h2 { margin-bottom: 20px; color: var(--primary-dark); }
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
-        input, select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 1rem; }
-        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(43,108,176,0.1); }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
-        button { background: var(--primary); color: white; border: none; padding: 12px 20px; font-size: 1rem; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; }
+        input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; box-sizing: border-box; }
+        button { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
         button:hover { background: var(--primary-dark); }
-        
-        .message { padding: 12px; margin-bottom: 20px; border-radius: 4px; display: none; font-weight: 500; }
-        .message.error { background: #fed7d7; color: var(--error); display: block; }
-        .message.success { background: #c6f6d5; color: var(--success); display: block; }
-        
-        .hidden { display: none !important; }
-        .nav-links { display: flex; gap: 15px; margin-bottom: 20px; font-size: 0.
+        .message { padding: 12px; margin-bottom: 20px; border-radius: 4px; display: none; }
+        .message.error { background: #fed7d7; color: var(--error); }
+        .message.success { background: #c6f6d5; color: var(--success); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Staff Portal Login</h2>
+        <div id="auth-msg" class="message"></div>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="login-email">Email Address</label>
+                <input type="email" id="login-email" required placeholder="staff@hospital.com">
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" required placeholder="••••••••">
+            </div>
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>
