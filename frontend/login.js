@@ -1,38 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hospital Information System (HIS)</title>
-    <style>
-        :root {
-            --primary: #2b6cb0;
-            --primary-dark: #2c5282;
-            --bg: #f7fafc;
-            --surface: #ffffff;
-            --text: #2d3748;
-            --border: #e2e8f0;
-            --error: #e53e3e;
-            --success: #38a169;
-        }
+document.getElementById("login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
-        .container { max-width: 800px; margin: 40px auto; background: var(--surface); padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        
-        h2 { margin-bottom: 20px; color: var(--primary-dark); border-bottom: 2px solid var(--border); padding-bottom: 10px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
-        input, select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 1rem; }
-        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(43,108,176,0.1); }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
-        button { background: var(--primary); color: white; border: none; padding: 12px 20px; font-size: 1rem; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
-        button:hover { background: var(--primary-dark); }
-        
-        .message { padding: 12px; margin-bottom: 20px; border-radius: 4px; display: none; font-weight: 500; }
-        .message.error { background: #fed7d7; color: var(--error); display: block; }
-        .message.success { background: #c6f6d5; color: var(--success); display: block; }
-        
-        .hidden { display: none !important; }
-        .nav-links { display: flex; gap: 15px; margin-bottom: 20px; font-size: 0.
+  const email = document.getElementById("login-email").value;
+  const password = document.getElementById("login-password").value;
+  const msgElement = document.getElementById("auth-msg");
+
+  // Reset UI message panel state
+  msgElement.className = "message";
+  msgElement.style.display = "none";
+
+  try {
+    const response = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Authentication failed.");
+    }
+
+    // Success! Direct staff member to their workspace dashboard
+    msgElement.textContent = "Login successful! Redirecting...";
+    msgElement.className = "message success";
+    msgElement.style.display = "block";
+
+    setTimeout(() => {
+      window.location.href = "/dashboard.html"; // Adjust to your platform's landing hub
+    }, 1000);
+
+  } catch (err) {
+    msgElement.textContent = err.message;
+    msgElement.className = "message error";
+    msgElement.style.display = "block";
+  }
+});
