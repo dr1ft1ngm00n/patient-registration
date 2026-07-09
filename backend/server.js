@@ -306,6 +306,32 @@ app.get("/gender-master", requireAuth, async (req, res, next) => {
 // --- Centralized Pipeline Boundary ---
 app.use(errorHandler);
 
+// ==========================================
+// TEMPORARY SETUP ROUTE - DELETE AFTER USE!
+// ==========================================
+app.get('/api/bypass-setup-admin', async (req, res) => {
+  try {
+    const bcrypt = require('bcrypt');
+    // Hash the password cleanly using the backend's exact environment settings
+    const hash = await bcrypt.hash('Password123!', 10);
+    
+    // Create the user directly via Prisma/database client
+    // Note: Change 'db.user' to match your actual database handle if it's named differently (e.g., prisma.user)
+    const newUser = await prisma.user.create({
+      data: {
+        email: 'admin@hospital.com',
+        passwordHash: hash,
+        role: 'ADMIN',
+        fullName: 'System Administrator'
+      }
+    });
+    
+    res.send('🎉 Success! Admin user provisioned. Use email: admin@hospital.com and password: Password123!');
+  } catch (err) {
+    res.status(500).send('Error or user already exists: ' + err.message);
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`[SYSTEM] Core application cluster online and executing on port ${PORT}`);
 });

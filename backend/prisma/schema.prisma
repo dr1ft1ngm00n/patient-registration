@@ -11,17 +11,17 @@ datasource db {
 }
 
 model Patient {
-  id        Int      @id @default(autoincrement())
-
-  firstName String
-  lastName  String
+  id          Int      @id @default(autoincrement())
+  firstName   String
+  lastName    String
   dateOfBirth DateTime
-  gender    String?
-  genderId  Int?
-  genderRef GenderMaster? @relation(fields: [genderId], references: [id])
+  
+  // 🔗 Cleaned-up Master Data Relation
+  genderId    Int
+  genderRef   GenderMaster @relation(fields: [genderId], references: [id])
 
-  email     String   @unique
-  phone     String
+  email       String   @unique
+  phone       String
 
   addressLine1 String
   addressLine2 String?
@@ -56,20 +56,20 @@ model User {
 
 model GenderMaster {
   id        Int       @id @default(autoincrement())
-  name      String    @unique
+  name      String    @unique // e.g., "Male", "Female", "Other"
   createdAt DateTime  @default(now())
 
   patients  Patient[]
 }
 
 model Appointment {
-  id          Int      @id @default(autoincrement())
+  id          Int               @id @default(autoincrement())
   patientId   Int
-  patient     Patient  @relation(fields: [patientId], references: [id])
+  patient     Patient           @relation(fields: [patientId], references: [id])
   doctorName  String
   dateTime    DateTime
   status      AppointmentStatus @default(SCHEDULED)
-  createdAt   DateTime @default(now())
+  createdAt   DateTime          @default(now())
 
   bills       Bill[]
 }
