@@ -8,7 +8,7 @@ const { patientSchema } = require("./validation");
 const { encrypt } = require("./encryption");
 const { requireAuth, authorizeRoles } = require("./requireAuth");
 const { logRegistrationEvent } = require("./auditLog");
-const { errorHandler } = require("./errorhandler");
+const { errorHandler } = require("./errorHandler");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
