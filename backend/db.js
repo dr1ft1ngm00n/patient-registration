@@ -1,46 +1,89 @@
 const { PrismaClient } = require("@prisma/client");
-const { encrypt } = require("./encryption");
+const { encrypt, decrypt } = require("./encryption");
 const bcrypt = require("bcrypt");
 
 const prisma = new PrismaClient();
 const SALT_ROUNDS = 12;
 
+// --- Cryptographic Helper ---
+/**
+ * Safely decrypts a patient record's insurance identifier.
+ * If decryption fails (e.g., corrupted data or altered encryption key),
+ * it flags the field gracefully rather than throwing a runtime crash.
+ */
+function decryptPatientData(patient) {
+  if (!patient) return null;
+  if (patient.insuranceMemberId) {
+    try {
+      patient.insuranceMemberId = decrypt(patient.insuranceMemberId);
+    } catch (err) {
+      console.error(`[SECURITY] Failed to decrypt insurance ID for patient ID ${patient.id}:`, err.message);
+      patient.insuranceMemberId = "ERROR_DECRYPTION_FAILED";
+    }
+  }
+  return patient;
+}
+
+// --- Patient Methods ---
 async function findByEmail(email) {
-  return prisma.patient.findUnique({ where: { email } });
+  const patient = await prisma.patient.findUnique({ where: { email } });
+  return decryptPatientData(patient);
 }
 
 async function findById(id) {
-  return prisma.patient.findUnique({ where: { id: Number(id) } });
+  const patient = await prisma.patient.findUnique({ where: { id: Number(id) } });
+  return decryptPatientData(patient);
 }
 
 async function createPatient(data) {
-  const encryptedData = {
-    ...data,
-    insuranceMemberId: encrypt(data.insuranceMemberId),
-  };
-  return prisma.patient.create({ data: encryptedData });
+  // Explicitly map properties and cast types to match schema.prisma expectations
+  const newPatient = await prisma.patient.create({
+    data: {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      dateOfBirth: new Date(data.dateOfBirth), // Convert string input to Date object
+      gender: data.gender || null,
+      genderId: data.genderId ? Number(data.genderId) : null, // Safely cast to Int
+      email: data.email,
+      phone: data.phone,
+      addressLine1: data.addressLine1,
+      addressLine2: data.addressLine2 || null,
+      city: data.city,
+      state: data.state,
+      postalCode: data.postalCode,
+      country: data.country,
+      insuranceProvider: data.insuranceProvider,
+      insuranceMemberId: encrypt(data.insuranceMemberId), // Encrypt sensitive identifier
+    },
+  });
+  return decryptPatientData(newPatient);
 }
 
 async function searchPatients(query) {
+  let patients;
+  
   if (!query) {
-    return prisma.patient.findMany({
+    patients = await prisma.patient.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
+  } else {
+    patients = await prisma.patient.findMany({
+      where: {
+        OR: [
+          { firstName: { contains: query, mode: "insensitive" } },
+          { lastName: { contains: query, mode: "insensitive" } },
+        ],
+      },
       orderBy: { createdAt: "desc" },
       take: 50,
     });
   }
 
-  return prisma.patient.findMany({
-    where: {
-      OR: [
-        { firstName: { contains: query, mode: "insensitive" } },
-        { lastName: { contains: query, mode: "insensitive" } },
-      ],
-    },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
+  return patients.map(decryptPatientData);
 }
 
+// --- User Methods ---
 async function createUser({ email, password, role, fullName }) {
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 
@@ -59,7 +102,7 @@ async function createAppointment({ patientId, doctorName, dateTime }) {
     data: {
       patientId: Number(patientId),
       doctorName,
-      dateTime: new Date(dateTime),
+      dateTime: new Date(dateTime), // Convert string input to Date object
     },
   });
 }
@@ -92,7 +135,7 @@ async function createBill({ patientId, appointmentId, serviceDescription, amount
       patientId: Number(patientId),
       appointmentId: appointmentId ? Number(appointmentId) : null,
       serviceDescription,
-      amount,
+      amount, // Prisma maps Decimals cleanly via string, number, or Decimal objects
     },
   });
 }

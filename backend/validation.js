@@ -1,18 +1,19 @@
 const { z } = require("zod");
 
+// Validates that the input is a valid ISO/date string without converting it to an object prematurely
 const dateOfBirthField = z
   .string()
-  .refine((val) => !Number.isNaN(Date.parse(val)), { message: "Invalid date" })
-  .transform((val) => new Date(val))
-  .refine((date) => date < new Date(), { message: "Date of birth must be in the past" })
-  .refine(
-    (date) => {
-      const cutoff = new Date();
-      cutoff.setFullYear(cutoff.getFullYear() - 130);
-      return date > cutoff;
-    },
-    { message: "Date of birth is implausibly old" }
-  );
+  .refine((val) => !Number.isNaN(Date.parse(val)), { message: "Invalid date format" })
+  .refine((val) => {
+    const date = new Date(val);
+    return date < new Date();
+  }, { message: "Date of birth must be in the past" })
+  .refine((val) => {
+    const date = new Date(val);
+    const cutoff = new Date();
+    cutoff.setFullYear(cutoff.getFullYear() - 130);
+    return date > cutoff;
+  }, { message: "Date of birth is implausibly old" });
 
 const safeTextField = (max) =>
   z
@@ -28,18 +29,23 @@ const patientSchema = z.object({
     .trim()
     .min(1, "First name is required")
     .max(100)
-    .regex(/^[A-Za-z' -]+$/, "Only letters, spaces, hyphens, apostrophes allowed"),
+    .regex(/^[A-Za-z' -]+$/, "Only letters, spaces, hyphens, and apostrophes allowed"),
 
   lastName: z
     .string()
     .trim()
     .min(1, "Last name is required")
     .max(100)
-    .regex(/^[A-Za-z' -]+$/, "Only letters, spaces, hyphens, apostrophes allowed"),
+    .regex(/^[A-Za-z' -]+$/, "Only letters, spaces, hyphens, and apostrophes allowed"),
 
   dateOfBirth: dateOfBirthField,
 
   gender: safeTextField(50).optional().or(z.literal("")),
+  
+  // Added to perfectly align with your relational database schema mapping
+  genderId: z
+    .union([z.number().int().positive(), z.string().regex(/^\d+$/).transform(Number)])
+    .optional(),
 
   email: z
     .string()

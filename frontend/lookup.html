@@ -115,7 +115,7 @@
 
   .result-grid {
     display: grid;
-    grid-template-columns: 110px 1fr;
+    grid-template-columns: 140px 1fr; /* Widened slightly for text spacing */
     row-gap: 10px;
     font-size: 14.5px;
   }
@@ -124,7 +124,7 @@
     color: var(--ink-soft);
     font-weight: 600;
   }
-  .result-grid dd { margin: 0; }
+  .result-grid dd { margin: 0; word-break: break-all; }
 
   .status-banner {
     display: none;
@@ -147,7 +147,7 @@
     <div class="eyebrow">Staff Lookup</div>
     <h1>Find a patient</h1>
     <div class="intro">
-      <p>Enter a patient ID to view their basic record.</p>
+      <p>Enter a patient ID to view their full registration data and decrypted insurance information.</p>
     </div>
 
     <div class="search-row">
@@ -162,10 +162,24 @@
       <dl class="result-grid">
         <dt>Patient ID</dt>
         <dd id="resultId"></dd>
-        <dt>Age</dt>
-        <dd id="resultAge"></dd>
-        <dt>Gender</dt>
+        
+        <dt>Date of Birth</dt>
+        <dd id="resultDOB"></dd>
+        
+        <dt>Gender Status</dt>
         <dd id="resultGender"></dd>
+
+        <dt>Contact Number</dt>
+        <dd id="resultPhone"></dd>
+
+        <dt>Email Address</dt>
+        <dd id="resultEmail"></dd>
+
+        <dt>Insurance Carrier</dt>
+        <dd id="resultProvider"></dd>
+
+        <dt>Insurance ID (Decrypted)</dt>
+        <dd><code id="resultInsuranceId" style="font-weight: 600; color: var(--sage);"></code></dd>
       </dl>
     </div>
   </div>

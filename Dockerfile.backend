@@ -1,27 +1,29 @@
 # Start from the official Node.js 20 image (slim = smaller, no unnecessary tools)
 FROM node:20-slim
 
-RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+# Install OpenSSL (required for Prisma Client to communicate with PostgreSQL)
+RUN apt-get update -y && \
+    apt-get install -y openssl && \
+    rm -rf /var/lib/apt/lists/*
 
 # Create a working directory inside the container
 WORKDIR /app
 
-# Copy package files first — this is a Docker best practice:
-# if your code changes but dependencies don't, Docker reuses the cached
-# npm install layer instead of re-running it every time. Saves time.
+# Copy package files first from the backend directory to leverage Docker caching
 COPY backend/package*.json ./
 
-# Install dependencies
-RUN npm install --production
+# Install production dependencies only
+RUN npm install --omit=dev
 
-# Copy the rest of the backend code
+# Copy the rest of the backend source files into the container
 COPY backend/ ./
 
-# Generate Prisma client inside the container
+# Ensure the prisma schema folder is accessible at the expected location for generation
+# (If your prisma/ folder lives at the root instead of inside backend/, adjust this path)
 RUN npx prisma generate
 
-# Expose the port your server runs on
+# Expose the application port
 EXPOSE 3001
 
-# Start the server
+# Start the application server
 CMD ["node", "server.js"]

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #FAF6F0; --panel: #FFFFFF; --ink: #2B2B28; --ink-soft: #6B6962; --sage: #3D5A4C; --line: #E4DFD5; --radius: 10px; }
+        body { background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; margin: 0; padding: 40px 20px; }
+        .container { max-width: 700px; margin: 0 auto; }
+        h1 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 28px; margin-bottom: 24px; }
+        .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+        input { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; box-sizing: border-box; }
+        button { background: var(--sage); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; }
+        button:hover { background: #324c40; }
+        .appt-list { list-style: none; padding: 0; }
+        .appt-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+        .appt-item:last-child { border: none; }
+        .status { font-weight: 600; text-transform: uppercase; font-size: 12px; padding: 2px 6px; border-radius: 4px; background: var(--line); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Appointment Management</h1>
+        
+        <div class="card">
+            <h3>Schedule New Appointment</h3>
+            <form id="apptForm">
+                <div class="form-group">
+                    <label>Patient ID</label>
+                    <input type="number" id="patientId" required min="1">
+                </div>
+                <div class="form-group">
+                    <label>Doctor Name</label>
+                    <input type="text" id="doctorName" required placeholder="Dr. Smith">
+                </div>
+                <div class="form-group">
+                    <label>Date & Time</label>
+                    <input type="datetime-local" id="dateTime" required>
+                </div>
+                <button type="submit">Book Appointment</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>All Scheduled Appointments</h3>
+            <ul id="apptList" class="appt-list"></ul>
+        </div>
+    </div>
+    <script src="appointments.js"></script>
+</body>
+</html>

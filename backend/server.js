@@ -1,150 +1,88 @@
-require("dotenv").config();
-
 const express = require("express");
 const session = require("express-session");
-const { patientSchema } = require("./validation");
-const {
-  findByEmail,
-  createPatient,
-  findById,
-  createUser,
-  findUserByEmail,
-  searchPatients,
-} = require("./db");
-const { errorHandler } = require("./errorHandler");
-const { logRegistrationEvent } = require("./auditLog");
-const { calculateAge } = require("./ageCalculator");
-const { requireAuth } = require("./requireAuth");
-const helmet = require("helmet");
-const cors = require("cors");
 const rateLimit = require("express-rate-limit");
-const morgan = require("morgan");
-const bcrypt = require("bcrypt");
-const {
-  findByEmail,
-  createPatient,
-  findById,
-  createUser,
-  findUserByEmail,
-  searchPatients,
-  createAppointment,
-  getAppointmentsByPatient,
-  updateAppointmentStatus,
-  getAllAppointments,
-  createBill,
-  getBillsByPatient,
-  updateBillStatus,
-  getAllBills,
-  getGenderMaster,
-} = require("./db");
+const helmet = require("helmet");
+
+const db = require("./db");
+const { patientSchema } = require("./validation");
+const { encrypt } = require("./encryption");
+const { requireAuth, authorizeRoles } = require("./requireAuth");
+const { logRegistrationEvent } = require("./auditlog");
+const { errorHandler } = require("./errorhandler");
 
 const app = express();
+const PORT = process.env.PORT || 3001;
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:"],
-      frameAncestors: ["'none'"],
-      formAction: ["'self'"],
-      objectSrc: ["'none'"],
-    },
-  },
-}));
-app.use(cors({
-  origin: "http://localhost:3000",
-}));
-app.use(morgan("dev"));
+// --- Security Middleware & Header Hardening ---
+app.use(helmet()); // Basic security headers
+
+// Fine-tuned Content Security Policy (CSP) to unbreak CSS layout styling issues
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; frame-ancestors 'none';"
+  );
+  next();
+});
+
 app.use(express.json());
 
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 2, // 2 hours
-  },
-}));
+// --- Brute Force & Rate Limiting Gatekeepers ---
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // Strict limit on auth checkpoints
+  message: { error: "Too many authentication attempts. Please try again later." },
+});
 
-app.use(express.static("public"));
-
-const registrationLimiter = rateLimit({
+const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
-  message: { error: "Too many registration attempts. Please try again later." },
+  max: 200,
+  message: { error: "Rate limit exceeded. Please throttle request frequencies." },
 });
 
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  message: { error: "Too many login attempts. Please try again later." },
-});
+app.use("/api/", apiLimiter);
 
-app.get("/", (req, res) => {
-  res.redirect("/index.html");
-});
+// --- Session Architecture Store ---
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "fallback-unsecure-secret-key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production", // true when running under Nginx HTTPS
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 12, // 12 Hours session validity bound
+    },
+  })
+);
 
-app.post("/register", registrationLimiter, async (req, res) => {
-  const result = patientSchema.safeParse(req.body);
+// --- 1. System Authentication Routes ---
 
-  if (!result.success) {
-    logRegistrationEvent("VALIDATION_FAILURE", { ip: req.ip });
-    return res.status(400).json({
-      error: "Invalid registration data",
-      details: result.error.flatten().fieldErrors,
-    });
-  }
-
-  const data = result.data;
-
-  const existing = await findByEmail(data.email);
-  if (existing) {
-    logRegistrationEvent("DUPLICATE_ATTEMPT", { email: data.email, ip: req.ip });
-    return res.status(400).json({
-      error: "We were unable to complete this registration. Please contact support if you believe this is an error.",
-    });
-  }
-
-  const patient = await createPatient(data);
-  logRegistrationEvent("REGISTRATION_SUCCESS", { email: data.email, ip: req.ip });
-
-  res.status(201).json({
-    message: "Registration successful",
-    patientId: patient.id,
-  });
-});
-
-app.post("/login", loginLimiter, async (req, res, next) => {
+app.post("/login", authLimiter, async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required" });
-    }
-
-    const user = await findUserByEmail(email);
+    const user = await db.findUserByEmail(email);
 
     if (!user) {
-      return res.status(401).json({ error: "Invalid email or password" });
+      logRegistrationEvent("AUTH_FAILURE", { email, ip: req.ip });
+      return res.status(401).json({ error: "Invalid email or password." });
     }
 
-    const passwordMatches = await bcrypt.compare(password, user.passwordHash);
+    const bcrypt = require("bcrypt");
+    const match = await bcrypt.compare(password, user.passwordHash);
 
-    if (!passwordMatches) {
-      return res.status(401).json({ error: "Invalid email or password" });
+    if (!match) {
+      logRegistrationEvent("AUTH_FAILURE", { email, ip: req.ip });
+      return res.status(401).json({ error: "Invalid email or password." });
     }
 
+    // Bind session parameters securely
     req.session.userId = user.id;
     req.session.role = user.role;
+    req.session.fullName = user.fullName;
 
-    res.json({
-      message: "Login successful",
-      user: { id: user.id, email: user.email, role: user.role, fullName: user.fullName },
-    });
+    res.json({ message: "Login successful", user: { email: user.email, role: user.role, fullName: user.fullName } });
   } catch (err) {
     next(err);
   }
@@ -152,183 +90,222 @@ app.post("/login", loginLimiter, async (req, res, next) => {
 
 app.post("/logout", (req, res) => {
   req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({ error: "Could not log out. Please try again." });
-    }
-    res.json({ message: "Logged out successfully" });
+    if (err) return res.status(500).json({ error: "Could not log out. Try again." });
+    res.clearCookie("connect.sid");
+    res.json({ message: "Logged out successfully." });
   });
 });
 
-app.get("/me", (req, res) => {
-  if (!req.session.userId) {
-    return res.status(401).json({ error: "Not logged in" });
-  }
-
-  res.json({ userId: req.session.userId, role: req.session.role });
+app.get("/me", requireAuth, (req, res) => {
+  res.json({ userId: req.session.userId, role: req.session.role, fullName: req.session.fullName });
 });
 
-app.get("/patients", requireAuth, async (req, res, next) => {
-  try {
-    const results = await searchPatients(req.query.q);
-
-    const safeResults = results.map((p) => ({
-      id: p.id,
-      firstName: p.firstName,
-      lastName: p.lastName,
-      age: calculateAge(p.dateOfBirth),
-      gender: p.gender,
-      email: p.email,
-    }));
-
-    res.json(safeResults);
-  } catch (err) {
-    next(err);
-  }
-});
-
-app.get("/patients/:id", requireAuth, async (req, res) => {
-  const patient = await findById(req.params.id);
-
-  if (!patient) {
-    return res.status(404).json({ error: "Patient not found" });
-  }
-
-  res.json({
-    id: patient.id,
-    firstName: patient.firstName,
-    lastName: patient.lastName,
-    age: calculateAge(patient.dateOfBirth),
-    gender: patient.gender,
-  });
-});
-
-app.post("/users", async (req, res, next) => {
+// Admin-only terminal endpoint to establish administrative accounts
+app.post("/users", requireAuth, authorizeRoles(["ADMIN"]), async (req, res, next) => {
   try {
     const { email, password, role, fullName } = req.body;
-
-    if (!email || !password || !role || !fullName) {
-      return res.status(400).json({ error: "email, password, role, and fullName are all required" });
+    if (!email || !password || !role) {
+      return res.status(400).json({ error: "Missing required profile parameters." });
     }
+    const existing = await db.findUserByEmail(email);
+    if (existing) return res.status(409).json({ error: "User account email already exists." });
 
-    const existing = await findUserByEmail(email);
-    if (existing) {
-      return res.status(400).json({ error: "A user with this email already exists" });
-    }
-
-    const user = await createUser({ email, password, role, fullName });
-
-    res.status(201).json({
-      message: "User created",
-      userId: user.id,
-      role: user.role,
-    });
+    const newUser = await db.createUser({ email, password, role, fullName });
+    res.status(201).json({ message: "Staff account provisioned.", userId: newUser.id });
   } catch (err) {
     next(err);
   }
 });
 
-// --- Gender Master ---
-app.get("/gender-master", async (req, res, next) => {
+
+// --- 2. Patient Domain Operations ---
+
+app.post("/patients", requireAuth, authorizeRoles(["ADMIN", "RECEPTIONIST"]), async (req, res, next) => {
   try {
-    const genders = await getGenderMaster();
-    res.json(genders);
+    const validation = patientSchema.safeParse(req.body);
+    if (!validation.success) {
+      logRegistrationEvent("VALIDATION_FAILURE", { email: req.body.email, ip: req.ip });
+      return res.status(400).json({ error: validation.error.errors[0].message });
+    }
+
+    const duplicate = await db.findByEmail(validation.data.email);
+    if (duplicate) {
+      logRegistrationEvent("DUPLICATE_ATTEMPT", { email: validation.data.email, ip: req.ip });
+      return res.status(409).json({ error: "A patient with this email address is already registered." });
+    }
+
+    const patient = await db.createPatient(validation.data);
+    logRegistrationEvent("REGISTRATION_SUCCESS", { email: patient.email, ip: req.ip });
+
+    res.status(201).json({ message: "Patient registered successfully", patientId: patient.id });
   } catch (err) {
     next(err);
   }
 });
 
-// --- Appointments ---
-app.post("/appointments", requireAuth, async (req, res, next) => {
+/**
+ * MISSING FEATURE IMPLEMENTATION: PUT /patients/:id
+ * Allows authorized staff members to update historical patient records safely.
+ */
+app.put("/patients/:id", requireAuth, authorizeRoles(["ADMIN", "RECEPTIONIST", "DOCTOR"]), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    
+    // Check if target record exists prior to modification execution
+    const targetPatient = await db.findById(id);
+    if (!targetPatient) {
+      return res.status(404).json({ error: "Patient profile not found." });
+    }
+
+    // Intercept payload via parsing rules
+    const validation = patientSchema.safeParse(req.body);
+    if (!validation.success) {
+      return res.status(400).json({ error: validation.error.errors[0].message });
+    }
+
+    // Check for email collision changes
+    if (validation.data.email !== targetPatient.email) {
+      const emailCollisionCheck = await db.findByEmail(validation.data.email);
+      if (emailCollisionCheck) {
+        return res.status(409).json({ error: "Email address conflict. This email belongs to another profile." });
+      }
+    }
+
+    // Execute atomic modification query pipeline 
+    const updatedPatient = await db.prisma.patient.update({
+      where: { id: Number(id) },
+      data: {
+        firstName: validation.data.firstName,
+        lastName: validation.data.lastName,
+        dateOfBirth: new Date(validation.data.dateOfBirth),
+        gender: validation.data.gender || null,
+        genderId: validation.data.genderId ? Number(validation.data.genderId) : null,
+        email: validation.data.email,
+        phone: validation.data.phone,
+        addressLine1: validation.data.addressLine1,
+        addressLine2: validation.data.addressLine2 || null,
+        city: validation.data.city,
+        state: validation.data.state,
+        postalCode: validation.data.postalCode,
+        country: validation.data.country,
+        insuranceProvider: validation.data.insuranceProvider,
+        insuranceMemberId: encrypt(validation.data.insuranceMemberId), // Re-encrypt new value securely
+      },
+    });
+
+    res.json({ message: "Patient profile updated successfully", patientId: updatedPatient.id });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get("/patients", requireAuth, authorizeRoles(["ADMIN", "RECEPTIONIST", "DOCTOR"]), async (req, res, next) => {
+  try {
+    const { q } = req.query;
+    const results = await db.searchPatients(q);
+    res.json(results);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get("/patients/:id", requireAuth, authorizeRoles(["ADMIN", "RECEPTIONIST", "DOCTOR"]), async (req, res, next) => {
+  try {
+    const patient = await db.findById(req.params.id);
+    if (!patient) return res.status(404).json({ error: "Patient profile not found." });
+    res.json(patient);
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+// --- 3. Appointment Operations ---
+
+app.post("/appointments", requireAuth, authorizeRoles(["ADMIN", "RECEPTIONIST"]), async (req, res, next) => {
   try {
     const { patientId, doctorName, dateTime } = req.body;
     if (!patientId || !doctorName || !dateTime) {
-      return res.status(400).json({ error: "patientId, doctorName and dateTime are required" });
+      return res.status(400).json({ error: "Missing scheduling metadata." });
     }
-    const appointment = await createAppointment({ patientId, doctorName, dateTime });
-    res.status(201).json({ message: "Appointment created", appointment });
+    const appointment = await db.createAppointment({ patientId, doctorName, dateTime });
+    res.status(201).json(appointment);
   } catch (err) {
     next(err);
   }
 });
 
-app.get("/appointments", requireAuth, async (req, res, next) => {
+app.get("/appointments", requireAuth, authorizeRoles(["ADMIN", "RECEPTIONIST", "DOCTOR"]), async (req, res, next) => {
   try {
-    const appointments = await getAllAppointments();
-    res.json(appointments);
+    const records = await db.getAllAppointments();
+    res.json(records);
   } catch (err) {
     next(err);
   }
 });
 
-app.get("/appointments/patient/:patientId", requireAuth, async (req, res, next) => {
+app.get("/appointments/patient/:patientId", requireAuth, authorizeRoles(["ADMIN", "RECEPTIONIST", "DOCTOR"]), async (req, res, next) => {
   try {
-    const appointments = await getAppointmentsByPatient(req.params.patientId);
-    res.json(appointments);
+    const records = await db.getAppointmentsByPatient(req.params.patientId);
+    res.json(records);
   } catch (err) {
     next(err);
   }
 });
 
-app.patch("/appointments/:id/status", requireAuth, async (req, res, next) => {
-  try {
-    const { status } = req.body;
-    if (!["SCHEDULED", "COMPLETED", "CANCELLED"].includes(status)) {
-      return res.status(400).json({ error: "Invalid status" });
-    }
-    const appointment = await updateAppointmentStatus(req.params.id, status);
-    res.json({ message: "Status updated", appointment });
-  } catch (err) {
-    next(err);
-  }
-});
 
-// --- Billing ---
-app.post("/bills", requireAuth, async (req, res, next) => {
+// --- 4. Billing & Ledger Invoicing ---
+
+app.post("/bills", requireAuth, authorizeRoles(["ADMIN", "RECEPTIONIST"]), async (req, res, next) => {
   try {
     const { patientId, appointmentId, serviceDescription, amount } = req.body;
-    if (!patientId || !serviceDescription || !amount) {
-      return res.status(400).json({ error: "patientId, serviceDescription and amount are required" });
+    if (!patientId || !serviceDescription || amount === undefined) {
+      return res.status(400).json({ error: "Missing invoice parameters." });
     }
-    const bill = await createBill({ patientId, appointmentId, serviceDescription, amount });
-    res.status(201).json({ message: "Bill created", bill });
+    const bill = await db.createBill({ patientId, appointmentId, serviceDescription, amount: parseFloat(amount) });
+    res.status(201).json(bill);
   } catch (err) {
     next(err);
   }
 });
 
-app.get("/bills", requireAuth, async (req, res, next) => {
+app.get("/bills", requireAuth, authorizeRoles(["ADMIN", "RECEPTIONIST"]), async (req, res, next) => {
   try {
-    const bills = await getAllBills();
-    res.json(bills);
+    const ledger = await db.getAllBills();
+    res.json(ledger);
   } catch (err) {
     next(err);
   }
 });
 
-app.get("/bills/patient/:patientId", requireAuth, async (req, res, next) => {
+app.patch("/bills/:id/status", requireAuth, authorizeRoles(["ADMIN", "RECEPTIONIST"]), async (req, res, next) => {
   try {
-    const bills = await getBillsByPatient(req.params.patientId);
-    res.json(bills);
+    const { paymentStatus } = req.body; // Expects "PAID" or "UNPAID"
+    if (!paymentStatus) return res.status(400).json({ error: "Missing target transaction status." });
+
+    const updatedBill = await db.updateBillStatus(req.params.id, paymentStatus);
+    res.json(updatedBill);
   } catch (err) {
     next(err);
   }
 });
 
-app.patch("/bills/:id/status", requireAuth, async (req, res, next) => {
+
+// --- 5. Supporting Master Data Routes ---
+
+app.get("/gender-master", requireAuth, async (req, res, next) => {
   try {
-    const { paymentStatus } = req.body;
-    if (!["PENDING", "PAID", "CANCELLED"].includes(paymentStatus)) {
-      return res.status(400).json({ error: "Invalid payment status" });
-    }
-    const bill = await updateBillStatus(req.params.id, paymentStatus);
-    res.json({ message: "Payment status updated", bill });
+    const masterData = await db.getGenderMaster();
+    res.json(masterData);
   } catch (err) {
     next(err);
   }
 });
 
+
+// --- Centralized Pipeline Boundary ---
 app.use(errorHandler);
 
-app.listen(3001, () => {
-  console.log("Server is running on port 3001");
+app.listen(PORT, () => {
+  console.log(`[SYSTEM] Core application cluster online and executing on port ${PORT}`);
 });

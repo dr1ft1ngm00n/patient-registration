@@ -28,6 +28,8 @@ services:
       dockerfile: Dockerfile.backend
     container_name: his_backend
     restart: unless-stopped
+    ports:
+      - "3001:3001" # Exposed to let frontend browser clients hit the API endpoints smoothly
     environment:
       DATABASE_URL: postgresql://postgres:${DB_PASSWORD}@db:5432/patient_registration
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
