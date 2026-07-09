@@ -7,7 +7,7 @@ const db = require("./db");
 const { patientSchema } = require("./validation");
 const { encrypt } = require("./encryption");
 const { requireAuth, authorizeRoles } = require("./requireAuth");
-const { logRegistrationEvent } = require("./auditlog");
+const { logRegistrationEvent } = require("./auditLog");
 const { errorHandler } = require("./errorhandler");
 
 const app = express();
