@@ -1,334 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Patient Registration</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #FAF6F0;
-    --panel: #FFFFFF;
-    --ink: #2B2B28;
-    --ink-soft: #6B6962;
-    --sage: #3D5A4C;
-    --sage-light: #E8EDE6;
-    --clay: #C97B5A;
-    --clay-soft: #F3E3DA;
-    --line: #E4DFD5;
-    --error: #B3452F;
-    --radius: 10px;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Registration</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --border-color: #333333;
+            --error-color: #ef4444;
+        }
 
-  * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
 
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: 'Inter', system-ui, sans-serif;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
+        .container {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 650px;
+            border: 1px solid var(--border-color);
+        }
 
-  .page {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 48px 24px 96px;
-  }
+        h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 28px;
+            color: #ffffff;
+            font-weight: 600;
+        }
 
-  header.intro {
-    margin-bottom: 36px;
-  }
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
 
-  .eyebrow {
-    font-size: 13px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--sage);
-    font-weight: 600;
-    margin: 0 0 10px;
-  }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
 
-  h1 {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 34px;
-    line-height: 1.15;
-    margin: 0 0 12px;
-    color: var(--ink);
-  }
+        .full-width {
+            grid-column: span 2;
+        }
 
-  .intro p {
-    color: var(--ink-soft);
-    font-size: 15.5px;
-    margin: 0;
-    max-width: 46ch;
-  }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
 
-  /* Progress indicator */
-  .progress {
-    display: flex;
-    gap: 6px;
-    margin: 28px 0 0;
-  }
-  .progress-segment {
-    flex: 1;
-    height: 4px;
-    border-radius: 4px;
-    background: var(--line);
-    transition: background 0.3s ease;
-  }
-  .progress-segment.active { background: var(--sage); }
+        label {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
 
-  form { margin-top: 8px; }
+        input, select {
+            background-color: #2a2a2a;
+            border: 1px solid var(--border-color);
+            color: #ffffff;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+            width: 100%;
+        }
 
-  fieldset {
-    border: none;
-    margin: 0 0 28px;
-    padding: 28px 28px 8px;
-    background: var(--panel);
-    border-radius: var(--radius);
-    border: 1px solid var(--line);
-  }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
 
-  legend {
-    font-family: 'Fraunces', serif;
-    font-size: 19px;
-    font-weight: 500;
-    padding: 0 0 18px;
-    color: var(--sage);
-  }
+        input::placeholder {
+            color: #777777;
+        }
 
-  .field {
-    margin-bottom: 18px;
-  }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 20px;
+            width: 100%;
+        }
 
-  .field:last-child { margin-bottom: 4px; }
+        button:hover {
+            background-color: var(--primary-hover);
+        }
 
-  .row-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
+        .nav-links {
+            margin-top: 24px;
+            text-align: center;
+        }
 
-  label {
-    display: block;
-    font-size: 13.5px;
-    font-weight: 600;
-    color: var(--ink);
-    margin-bottom: 6px;
-  }
+        .nav-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+        }
 
-  .optional-tag {
-    color: var(--ink-soft);
-    font-weight: 400;
-    font-size: 12.5px;
-  }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
 
-  input {
-    width: 100%;
-    padding: 11px 13px;
-    font-size: 15px;
-    font-family: inherit;
-    color: var(--ink);
-    background: var(--bg);
-    border: 1px solid var(--line);
-    border-radius: 7px;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  }
-
-  input:focus {
-    outline: none;
-    border-color: var(--clay);
-    box-shadow: 0 0 0 3px var(--clay-soft);
-  }
-
-  input.invalid {
-    border-color: var(--error);
-  }
-
-  .field-error {
-    font-size: 12.5px;
-    color: var(--error);
-    margin-top: 5px;
-    min-height: 0;
-  }
-
-  .help-text {
-    font-size: 12.5px;
-    color: var(--ink-soft);
-    margin-top: 5px;
-  }
-
-  button[type="submit"] {
-    width: 100%;
-    padding: 15px;
-    font-family: inherit;
-    font-size: 15.5px;
-    font-weight: 600;
-    color: #fff;
-    background: var(--sage);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.15s ease, transform 0.1s ease;
-  }
-
-  button[type="submit"]:hover { background: #324c40; }
-  button[type="submit"]:active { transform: scale(0.99); }
-  button[type="submit"]:disabled {
-    background: var(--line);
-    color: var(--ink-soft);
-    cursor: not-allowed;
-  }
-
-  .status-banner {
-    display: none;
-    margin-top: 20px;
-    padding: 16px 18px;
-    border-radius: var(--radius);
-    font-size: 14.5px;
-  }
-  .status-banner.show { display: block; }
-  .status-banner.success {
-    background: var(--sage-light);
-    color: var(--sage);
-    border: 1px solid #c7d6cd;
-  }
-  .status-banner.error {
-    background: var(--clay-soft);
-    color: var(--error);
-    border: 1px solid #e6c4b5;
-  }
-  .status-banner strong { display: block; margin-bottom: 4px; font-weight: 600; }
-
-  @media (max-width: 520px) {
-    .row-2 { grid-template-columns: 1fr; }
-    h1 { font-size: 28px; }
-    fieldset { padding: 22px 18px 6px; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; }
-  }
-</style>
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .full-width {
+                grid-column: span 1;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="page">
-    <header class="intro">
-      <p class="eyebrow">New Patient</p>
-      <h1>Let's get you registered</h1>
-      <p>This takes about three minutes. Everything you enter is validated and stored securely — you can leave anything marked optional blank.</p>
-      <div class="progress" id="progressBar">
-        <div class="progress-segment active" data-section="0"></div>
-        <div class="progress-segment" data-section="1"></div>
-        <div class="progress-segment" data-section="2"></div>
-        <div class="progress-segment" data-section="3"></div>
-      </div>
-    </header>
 
-    <form id="registrationForm" novalidate>
-      <fieldset data-section="0">
-        <legend>About you</legend>
-        <div class="row-2">
-          <div class="field">
-            <label for="firstName">First name</label>
-            <input id="firstName" name="firstName" required />
-            <div class="field-error" data-error-for="firstName"></div>
-          </div>
-          <div class="field">
-            <label for="lastName">Last name</label>
-            <input id="lastName" name="lastName" required />
-            <div class="field-error" data-error-for="lastName"></div>
-          </div>
-        </div>
-        <div class="field">
-          <label for="dateOfBirth">Date of birth</label>
-          <input id="dateOfBirth" name="dateOfBirth" type="date" required />
-          <div class="field-error" data-error-for="dateOfBirth"></div>
-        </div>
-        <div class="field">
-          <label for="gender">Gender <span class="optional-tag">(optional)</span></label>
-          <input id="gender" name="gender" placeholder="e.g. Female, Male, Non-binary" />
-        </div>
-      </fieldset>
+<div class="container">
+    <h2>Patient Registration</h2>
+    <p class="subtitle">Enter the patient's biological, contact, and insurance records securely below.</p>
+    
+    <form id="registrationForm">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" name="firstName" placeholder="John" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" name="lastName" placeholder="Doe" required>
+            </div>
 
-      <fieldset data-section="1">
-        <legend>Contact details</legend>
-        <div class="field">
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" required />
-          <div class="field-error" data-error-for="email"></div>
-        </div>
-        
-</div>
-        <div class="field">
-          <label for="phone">Phone number</label>
-          <input id="phone" name="phone" type="tel" placeholder="55523 54567" required />
-          <div class="field-error" data-error-for="phone"></div>
-        </div>
-      </fieldset>
+            <div class="form-group">
+                <label for="dateOfBirth">Date of Birth</label>
+                <input type="date" id="dateOfBirth" name="dateOfBirth" required>
+            </div>
 
-      <fieldset data-section="2">
-        <legend>Home address</legend>
-        <div class="field">
-          <label for="addressLine1">Address line 1</label>
-          <input id="addressLine1" name="addressLine1" required />
-          <div class="field-error" data-error-for="addressLine1"></div>
-        </div>
-        <div class="field">
-          <label for="addressLine2">Address line 2 <span class="optional-tag">(optional)</span></label>
-          <input id="addressLine2" name="addressLine2" placeholder="Apartment, suite, unit" />
-        </div>
-        <div class="row-2">
-          <div class="field">
-            <label for="city">City</label>
-            <input id="city" name="city" required />
-            <div class="field-error" data-error-for="city"></div>
-          </div>
-          <div class="field">
-            <label for="state">State / Province</label>
-            <input id="state" name="state" required />
-            <div class="field-error" data-error-for="state"></div>
-          </div>
-        </div>
-        <div class="row-2">
-          <div class="field">
-            <label for="postalCode">Postal code</label>
-            <input id="postalCode" name="postalCode" required />
-            <div class="field-error" data-error-for="postalCode"></div>
-          </div>
-          <div class="field">
-            <label for="country">Country</label>
-            <input id="country" name="country" required />
-            <div class="field-error" data-error-for="country"></div>
-          </div>
-        </div>
-      </fieldset>
+            <div class="form-group">
+                <label for="genderId">Gender</label>
+                <select id="genderId" name="genderId" required>
+                    <option value="">Select Gender</option>
+                    <option value="1">Male</option>
+                    <option value="2">Female</option>
+                    <option value="3">Other</option>
+                </select>
+            </div>
 
-      <fieldset data-section="3">
-        <legend>Insurance</legend>
-        <div class="field">
-          <label for="insuranceProvider">Insurance provider</label>
-          <input id="insuranceProvider" name="insuranceProvider" required />
-          <div class="field-error" data-error-for="insuranceProvider"></div>
-        </div>
-        <div class="field">
-          <label for="insuranceMemberId">Member ID</label>
-          <input id="insuranceMemberId" name="insuranceMemberId" placeholder="Letters, numbers, and hyphens" required />
-          <div class="field-error" data-error-for="insuranceMemberId"></div>
-        </div>
-      </fieldset>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="john.doe@example.com" required>
+            </div>
 
-      <button type="submit" id="submitButton">Complete registration</button>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="+1234567890" required>
+            </div>
 
-      <div class="status-banner" id="statusBanner"></div>
+            <div class="form-group full-width">
+                <label for="addressLine1">Address Line 1</label>
+                <input type="text" id="addressLine1" name="addressLine1" placeholder="123 Main St" required>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="addressLine2">Address Line 2 (Optional)</label>
+                <input type="text" id="addressLine2" name="addressLine2" placeholder="Apt 4B">
+            </div>
+
+            <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" id="city" name="city" placeholder="New York" required>
+            </div>
+
+            <div class="form-group">
+                <label for="state">State / Province</label>
+                <input type="text" id="state" name="state" placeholder="NY" required>
+            </div>
+
+            <div class="form-group">
+                <label for="postalCode">Postal / ZIP Code</label>
+                <input type="text" id="postalCode" name="postalCode" placeholder="10001" required>
+            </div>
+
+            <div class="form-group">
+                <label for="country">Country</label>
+                <input type="text" id="country" name="country" placeholder="United States" required>
+            </div>
+
+            <div class="form-group">
+                <label for="insuranceProvider">Insurance Provider</label>
+                <input type="text" id="insuranceProvider" name="insuranceProvider" placeholder="Blue Cross" required>
+            </div>
+
+            <div class="form-group">
+                <label for="insuranceMemberId">Insurance Member ID</label>
+                <input type="text" id="insuranceMemberId" name="insuranceMemberId" placeholder="XYZ-123456" required>
+            </div>
+        </div>
+
+        <button type="submit">Register Patient File</button>
     </form>
-  </div>
 
-  <script src="register.js"></script>
+    <div class="nav-links">
+        <a href="patients.html">← View Registered Patient Directory</a>
+    </div>
+</div>
+
+<script src="register.js"></script>
 </body>
 </html>
