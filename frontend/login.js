@@ -10,7 +10,8 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
   msgElement.style.display = "none";
 
   try {
-    const response = await fetch("/api/login", {
+    // 🛠️ Fixed: Explicitly routing to the local Docker Express port
+    const response = await fetch("http://localhost:3001/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -54,7 +55,8 @@ document.getElementById("registration-form").addEventListener("submit", async (e
   };
 
   try {
-    const response = await fetch("/api/patients", {
+    // 🛠️ Fixed: Explicitly routing to the local Docker Express port
+    const response = await fetch("http://localhost:3001/api/patients", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -77,7 +79,8 @@ document.getElementById("registration-form").addEventListener("submit", async (e
 
 // --- Handle Logout ---
 document.getElementById("logoutBtn").addEventListener("click", async () => {
-  await fetch("/api/logout", { method: "POST" });
+  // 🛠️ Fixed: Explicitly routing to the local Docker Express port
+  await fetch("http://localhost:3001/api/logout", { method: "POST" });
   document.getElementById("registration-panel").classList.add("hidden");
   document.getElementById("auth-panel").classList.remove("hidden");
   document.getElementById("login-form").reset();
