@@ -73,6 +73,33 @@ app.post('/api/register', async (req, res, next) => {
     }
 });
 
+// 🔐 Restored Administrative Login Endpoint
+app.post('/api/login', async (req, res, next) => {
+    try {
+        const { email, password } = req.body;
+
+        // Basic validation check
+        if (!email || !password) {
+            return res.status(400).json({ error: "Email and password are required fields." });
+        }
+
+        // 🛡️ Admin demo credentials check 
+        // (Adjust this logic if your system checks a database User table instead!)
+        if (email === "admin@hospital.com" && password === "admin123") {
+            return res.status(200).json({
+                success: true,
+                message: "Authentication successful.",
+                token: "demo-jwt-session-token" // Replace with real token generation if needed
+            });
+        }
+
+        return res.status(401).json({ error: "Invalid administrative email or password combination." });
+
+    } catch (error) {
+        next(error);
+    }
+});
+
 // Primary Server Status Verification Routing Entry
 app.get('/', (req, res) => {
     res.send("🚀 Express network server engine online and listening on port 3001");
