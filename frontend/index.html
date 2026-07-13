@@ -108,6 +108,12 @@
 </div>
 
 <script>
+  // 🛡️ Security Route Guard: Prevent unauthenticated dashboard access
+  if (!localStorage.getItem('sessionToken')) {
+      window.location.href = '/login.html';
+  }
+
+  // Handle transaction submission
   document.getElementById('registrationForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const messageDiv = document.getElementById('responseMessage');
