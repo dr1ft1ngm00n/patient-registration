@@ -1,155 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hospital Information System (HIS)</title>
-    <style>
-        :root {
-            --primary: #2b6cb0;
-            --primary-dark: #2c5282;
-            --bg: #f7fafc;
-            --surface: #ffffff;
-            --text: #2d3748;
-            --border: #e2e8f0;
-            --error: #e53e3e;
-            --success: #38a169;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
-        .container { max-width: 800px; margin: 40px auto; background: var(--surface); padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        
-        h2 { margin-bottom: 20px; color: var(--primary-dark); border-bottom: 2px solid var(--border); padding-bottom: 10px; }
-        h3 { margin-top: 10px; margin-bottom: 15px; color: var(--text); }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 1rem; font-family: inherit; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(43,108,176,0.1); }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
-        button { background: var(--primary); color: white; border: none; padding: 12px 20px; font-size: 1rem; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
-        button:hover { background: var(--primary-dark); }
-        
-        .message { padding: 12px; margin-bottom: 20px; border-radius: 4px; display: none; font-weight: 500; }
-        .message.error { background: #fed7d7; color: var(--error); display: block; }
-        .message.success { background: #c6f6d5; color: var(--success); display: block; }
-        
-        .hidden { display: none !important; }
-        .nav-links { display: flex; gap: 15px; margin-bottom: 20px; font-size: 0.9rem; }
-        .nav-links a { color: var(--primary); text-decoration: none; font-weight: 600; }
-        .nav-links a:hover { text-decoration: underline; }
-        .logout-btn { background: #e53e3e; width: auto; padding: 6px 12px; font-size: 0.85rem; margin-top: 0; }
-        .logout-btn:hover { background: #c53030; }
-        .header-space { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Registration Portal</title>
+  <style>
+    /* Clean minimal layout styles for the form structure */
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f8; color: #333; margin: 0; padding: 40px; }
+    .form-container { max-width: 600px; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 0 auto; }
+    h2 { margin-top: 0; color: #111; border-bottom: 2px solid #eaeaea; padding-bottom: 10px; }
+    .form-group { margin-bottom: 20px; display: flex; flex-direction: column; }
+    label { font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
+    input, select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
+    input:focus, select:focus { border-color: #0066cc; outline: none; }
+    button { background: #0066cc; color: #fff; padding: 12px; border: none; border-radius: 4px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+    button:hover { background: #0052a3; }
+    .message { margin-top: 20px; padding: 12px; border-radius: 4px; display: none; }
+    .success { background: #e6f4ea; color: #1e7e34; border: 1px solid #d4edda; }
+    .error { background: #fce8e6; color: #c5221f; border: 1px solid #f8d7da; }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="lookup.html">Patient Lookup</a>
-            <a href="appointments.html">Appointments</a>
-            <a href="billing.html">Billing Ledger</a>
-        </div>
-
-        <div id="auth-panel">
-            <h2>Staff Portal Login</h2>
-            <div id="auth-msg" class="message" style="display: none;"></div>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="login-email">Email Address</label>
-                    <input type="email" id="login-email" required placeholder="staff@hospital.com">
-                </div>
-                <div class="form-group">
-                    <label for="login-password">Password</label>
-                    <input type="password" id="login-password" required placeholder="••••••••">
-                </div>
-                <button type="submit">Sign In</button>
-            </form>
-        </div>
-
-        <div id="registration-panel" class="hidden">
-            <div class="header-space">
-                <h2 style="border: none; margin: 0; padding: 0;">Patient Registration Desk</h2>
-                <button id="logoutBtn" class="logout-btn">Sign Out</button>
-            </div>
-            
-            <div id="reg-msg" class="message" style="display: none;"></div>
-
-            <form id="registration-form">
-                <h3>Demographics</h3>
-                <div class="grid">
-                    <div class="form-group">
-                        <label>First Name</label>
-                        <input type="text" id="reg-firstName" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Last Name</label>
-                        <input type="text" id="reg-lastName" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Date of Birth</label>
-                        <input type="date" id="reg-dob" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Gender Status ID</label>
-                        <input type="number" id="reg-genderId" placeholder="e.g. 1" required>
-                    </div>
-                </div>
-
-                <h3>Contact & Address</h3>
-                <div class="grid">
-                    <div class="form-group">
-                        <label>Email Address</label>
-                        <input type="email" id="reg-email" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Phone Number</label>
-                        <input type="text" id="reg-phone" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Address Line 1</label>
-                    <input type="text" id="reg-address1" required>
-                </div>
-                <div class="grid">
-                    <div class="form-group">
-                        <label>City</label>
-                        <input type="text" id="reg-city" required>
-                    </div>
-                    <div class="form-group">
-                        <label>State</label>
-                        <input type="text" id="reg-state" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Postal Code</label>
-                        <input type="text" id="reg-postal" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Country</label>
-                        <input type="text" id="reg-country" required value="US">
-                    </div>
-                </div>
-
-                <h3>Insurance Identification</h3>
-                <div class="grid">
-                    <div class="form-group">
-                        <label>Insurance Provider</label>
-                        <input type="text" id="reg-provider" required placeholder="Blue Cross">
-                    </div>
-                    <div class="form-group">
-                        <label>Insurance Member ID (Encrypted)</label>
-                        <input type="text" id="reg-insuranceId" required placeholder="XYZ123456">
-                    </div>
-                </div>
-
-                <button type="submit">Register New Patient</button>
-            </form>
-        </div>
+<div class="form-container">
+  <h2>Patient Registration</h2>
+  <form id="registrationForm">
+    
+    <div class="form-group">
+      <label for="firstName">First Name</label>
+      <input type="text" id="firstName" name="firstName" required>
     </div>
 
-    <script src="login.js"></script>
+    <div class="form-group">
+      <label for="lastName">Last Name</label>
+      <input type="text" id="lastName" name="lastName" required>
+    </div>
+
+    <div class="form-group">
+      <label for="dateOfBirth">Date of Birth</label>
+      <input type="date" id="dateOfBirth" name="dateOfBirth" required>
+    </div>
+
+    <div class="form-group">
+      <label for="gender">Gender</label>
+      <select id="gender" name="gender" required>
+        <option value="" disabled selected>-- Select Patient Gender --</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other / Non-binary</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" required>
+    </div>
+
+    <div class="form-group">
+      <label for="phone">Phone Number</label>
+      <input type="tel" id="phone" name="phone" required>
+    </div>
+
+    <div class="form-group">
+      <label for="addressLine1">Address Line 1</label>
+      <input type="text" id="addressLine1" name="addressLine1" required>
+    </div>
+
+    <div class="form-group">
+      <label for="addressLine2">Address Line 2 (Optional)</label>
+      <input type="text" id="addressLine2" name="addressLine2">
+    </div>
+
+    <div class="form-group">
+      <label for="city">City</label>
+      <input type="text" id="city" name="city" required>
+    </div>
+
+    <div class="form-group">
+      <label for="state">State</label>
+      <input type="text" id="state" name="state" required>
+    </div>
+
+    <div class="form-group">
+      <label for="postalCode">Postal / ZIP Code</label>
+      <input type="text" id="postalCode" name="postalCode" required>
+    </div>
+
+    <div class="form-group">
+      <label for="country">Country</label>
+      <input type="text" id="country" name="country" required>
+    </div>
+
+    <div class="form-group">
+      <label for="insuranceProvider">Insurance Provider</label>
+      <input type="text" id="insuranceProvider" name="insuranceProvider" required>
+    </div>
+
+    <div class="form-group">
+      <label for="insuranceMemberId">Insurance Policy Member ID</label>
+      <input type="text" id="insuranceMemberId" name="insuranceMemberId" required>
+    </div>
+
+    <button type="submit">Register Patient File</button>
+  </form>
+
+  <div id="responseMessage" class="message"></div>
+</div>
+
+<script>
+  document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const messageDiv = document.getElementById('responseMessage');
+    messageDiv.style.display = 'none';
+
+    // Pack the standard structured form fields up cleanly
+    const formData = new FormData(e.target);
+    const payload = Object.fromEntries(formData.entries());
+
+    try {
+      // Direct transaction payload dispatch to our Express server engine
+      const response = await fetch('http://localhost:3001/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        messageDiv.className = 'message success';
+        messageDiv.textContent = `Success! Patient registered safely. System Assignment ID: ${data.patientId}`;
+        e.target.reset();
+      } else {
+        messageDiv.className = 'message error';
+        messageDiv.textContent = data.error || 'An operational verification error occurred.';
+      }
+    } catch (err) {
+      messageDiv.className = 'message error';
+      messageDiv.textContent = 'Unable to reach backend network registration services.';
+    }
+    messageDiv.style.display = 'block';
+  });
+</script>
 </body>
 </html>
