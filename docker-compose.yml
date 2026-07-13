@@ -10,7 +10,9 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data # 💾 Protected local persistent engine
+    ports:
+      - "5432:5432"
     networks:
       - his_network
     healthcheck:
@@ -27,7 +29,7 @@ services:
     container_name: his_backend
     restart: unless-stopped
     ports:
-      - "3001:3001" # Exposed to let frontend browser clients hit the API endpoints smoothly
+      - "3001:3001"
     environment:
       DATABASE_URL: postgresql://postgres:${DB_PASSWORD}@db:5432/patient_registration
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
@@ -63,6 +65,8 @@ services:
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
     ports:
       - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin # 🛠️ Claude's Fix: Keeps pgAdmin servers saved
     networks:
       - his_network
 
@@ -70,5 +74,9 @@ networks:
   his_network:
     driver: bridge
 
+# 🔒 Named Volumes: This tells Docker to never wipe these folders on 'down'
 volumes:
   postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
