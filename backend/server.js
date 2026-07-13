@@ -21,13 +21,14 @@ app.post('/api/register', async (req, res, next) => {
         // 1. Structural evaluation via Zod gateway engine
         const validatedData = patientSchema.parse(req.body);
 
-        // 2. Resolve human-readable text labels into database relational primary keys
+        // 2. Format the incoming text value natively in JS to ensure clean lookup compatibility
+        // Transforms 'male' -> 'Male', 'female' -> 'Female', 'other' -> 'Other'
+        const formattedGender = validatedData.gender.charAt(0).toUpperCase() + validatedData.gender.slice(1);
+
+        // 3. Resolve human-readable text labels into database relational primary keys
         const genderRecord = await prisma.genderMaster.findFirst({
             where: {
-                name: {
-                    equals: validatedData.gender,
-                    mode: 'insensitive' // Overrides upper/lower text casting mismatches
-                }
+                name: formattedGender
             }
         });
 
@@ -38,7 +39,7 @@ app.post('/api/register', async (req, res, next) => {
             });
         }
 
-        // 3. Complete database transaction layer execution
+        // 4. Complete database transaction layer execution
         const newPatient = await prisma.patient.create({
             data: {
                 firstName: validatedData.firstName,
@@ -73,23 +74,24 @@ app.post('/api/register', async (req, res, next) => {
     }
 });
 
-// 🔐 Restored Administrative Login Endpoint
+/**
+ * 🔐 Restored Administrative Staff Authentication Endpoint
+ */
 app.post('/api/login', async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
-        // Basic validation check
+        // Basic structural validation check
         if (!email || !password) {
             return res.status(400).json({ error: "Email and password are required fields." });
         }
 
-        // 🛡️ Admin demo credentials check 
-        // (Adjust this logic if your system checks a database User table instead!)
+        // 🛡️ Admin demo credentials check
         if (email === "admin@hospital.com" && password === "admin123") {
             return res.status(200).json({
                 success: true,
                 message: "Authentication successful.",
-                token: "demo-jwt-session-token" // Replace with real token generation if needed
+                token: "demo-jwt-session-token"
             });
         }
 
