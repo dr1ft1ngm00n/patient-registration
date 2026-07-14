@@ -1,82 +1,67 @@
-services:
+version: '3.8'
 
-  # --- PostgreSQL database ---
+services:
+  # -------------------------------------------------------------------------
+  # 1. DATABASE TIER (PostgreSQL Relational Storage Engine)
+  # -------------------------------------------------------------------------
   db:
-    image: postgres:16-alpine
-    container_name: his_db
-    restart: unless-stopped
+    image: postgres:15-alpine
+    container_name: his_postgres_db
+    restart: always
     environment:
-      POSTGRES_DB: patient_registration
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data # 💾 Protected local persistent engine
+      POSTGRES_PASSWORD: kali
+      POSTGRES_DB: patient_registration
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - his_network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
-  # --- Backend (Node/Express) ---
+  # -------------------------------------------------------------------------
+  # 2. BACKEND API TIER (Node.js + Express + Prisma Engine)
+  # -------------------------------------------------------------------------
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
-    container_name: his_backend
-    restart: unless-stopped
+    build: ./backend
+    container_name: his_backend_api
+    restart: always
     ports:
       - "3001:3001"
     environment:
-      DATABASE_URL: postgresql://postgres:${DB_PASSWORD}@db:5432/patient_registration
-      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
-      SESSION_SECRET: ${SESSION_SECRET}
-      NODE_ENV: production
+      # Routes natively through the Docker virtual network to the 'db' service
+      - DATABASE_URL=postgresql://postgres:kali@db:5432/patient_registration?schema=public
+      # Cryptographic security keys for encryption and session validation (OWASP)
+      - ENCRYPTION_KEY=9de9f02c659811daf1bf74da429923b7686952482bbf85fcb7d201f481008c30
+      - SESSION_SECRET=f5f165dc2ea734c07fa5fbfeca3d1efef3100b8a714d26f4e1f0f68906e7197e
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     networks:
       - his_network
 
-  # --- Frontend (nginx serving static files) ---
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-    container_name: his_frontend
-    restart: unless-stopped
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-    networks:
-      - his_network
-
-  # --- pgAdmin (database GUI) ---
+  # -------------------------------------------------------------------------
+  # 3. DB ADMINISTRATION TIER (pgAdmin Web Console Layout)
+  # -------------------------------------------------------------------------
   pgadmin:
     image: dpage/pgadmin4
-    container_name: his_pgadmin
-    restart: unless-stopped
+    container_name: his_pgadmin_console
+    restart: always
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_DEFAULT_EMAIL: admin@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: adminpassword
     ports:
-      - "5050:80"
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin # 🛠️ Claude's Fix: Keeps pgAdmin servers saved
+      - "8080:80"
+    depends_on:
+      - db
     networks:
       - his_network
 
+# ---------------------------------------------------------------------------
+# NETWORKS & VOLUMES DEFINITION
+# ---------------------------------------------------------------------------
 networks:
   his_network:
     driver: bridge
 
-# 🔒 Named Volumes: This tells Docker to never wipe these folders on 'down'
 volumes:
   postgres_data:
-    driver: local
-  pgadmin_data:
-    driver: local
