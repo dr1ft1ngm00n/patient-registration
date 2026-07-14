@@ -110,7 +110,7 @@
 <script>
   // 🛡️ Security Route Guard: Prevent unauthenticated dashboard access
   if (!localStorage.getItem('sessionToken')) {
-      window.location.href = '/login.html';
+      window.location.href = './login.html';
   }
 
   // Handle transaction submission

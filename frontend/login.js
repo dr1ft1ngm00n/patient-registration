@@ -35,7 +35,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
             // Forward the active window viewport smoothly to the registration layout
             setTimeout(() => {
-                window.location.href = '/index.html';
+                window.location.href = './index.html';
             }, 1000);
         } else {
             msgDiv.className = 'message error';
