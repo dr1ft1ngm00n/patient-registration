@@ -9,8 +9,15 @@ const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3001;
 
 // Global Middleware Configuration
-app.use(cors({ origin: 'http://localhost:3000' })); // Permits smooth connection from our frontend interface
-app.use(express.json());
+// Global Middleware Configuration
+app.use(cors({ 
+    origin: [
+        'http://localhost:3000', 
+        'https://dr1ft1ngm00n.github.io'
+    ],
+    credentials: true
+}));
+app.use(express.json()); // Permits smooth connection from our frontend interface
 
 /**
  * 💾 Patient Registration API Endpoint
