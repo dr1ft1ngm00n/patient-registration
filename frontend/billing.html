@@ -3,42 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Billing Operations</title>
+    <title>HIS — Financial Ledger</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #FAF6F0; --panel: #FFFFFF; --ink: #2B2B28; --ink-soft: #6B6962; --clay: #C97B5A; --line: #E4DFD5; --radius: 10px; }
-        body { background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; margin: 0; padding: 40px 20px; }
-        .container { max-width: 750px; margin: 0 auto; }
-        h1 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 28px; margin-bottom: 24px; }
-        .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
-        .form-group { margin-bottom: 16px; }
-        label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; box-sizing: border-box; }
-        button { background: var(--clay); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; }
-        button:hover { background: #b06646; }
-        .bill-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
-        .bill-table th, .bill-table td { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); }
-        .bill-table th { color: var(--ink-soft); font-weight: 600; }
-        .status-btn { padding: 4px 8px; border-radius: 4px; border: 1px solid var(--line); cursor: pointer; background: var(--bg); font-size: 12px; }
+        :root { 
+            --bg: #0D0F12;             /* Dark Obsidian background */
+            --panel: #161A20;          /* Deep Slate Panel */
+            --ink: #F3F4F6;            /* Crisp White Text */
+            --ink-soft: #9CA3AF;       /* Soft Gray Secondary Text */
+            --accent: #F59E0B;         /* Cyber Gold / Amber for billing */
+            --accent-hover: #D97706;   /* Darker Amber */
+            --line: #242B35;           /* Gritty Border Line */
+            --danger: #EF4444;         /* Cyber Crimson for deletions/logout */
+            --radius: 10px; 
+        }
+
+        body { 
+            background: var(--bg); 
+            color: var(--ink); 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        /* Unified Secure Navigation Bar */
+        .nav-header {
+            background: var(--panel);
+            border-bottom: 2px solid var(--line);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-family: 'Fraunces', serif;
+            font-weight: 500;
+            font-size: 20px;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--ink-soft);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.2s ease;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--ink);
+            background: var(--line);
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: var(--danger);
+            color: var(--ink);
+        }
+
+        /* Main Workspace Content Container */
+        .container { 
+            max-width: 800px; 
+            margin: 40px auto; 
+            padding: 0 20px;
+        }
+
+        h1 { 
+            font-family: 'Fraunces', serif; 
+            font-weight: 500; 
+            font-size: 32px; 
+            margin-bottom: 24px; 
+            border-left: 4px solid var(--accent);
+            padding-left: 12px;
+        }
+
+        .card { 
+            background: var(--panel); 
+            border: 1px solid var(--line); 
+            border-radius: var(--radius); 
+            padding: 28px; 
+            margin-bottom: 28px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            font-family: 'Fraunces', serif;
+            font-size: 20px;
+            color: var(--accent);
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 10px;
+        }
+
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+
+        label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            font-size: 13px; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--ink-soft);
+        }
+
+        input, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            background: var(--bg);
+            border: 1px solid var(--line); 
+            border-radius: 6px; 
+            font-family: inherit; 
+            color: var(--ink);
+            box-sizing: border-box; 
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+        }
+
+        button[type="submit"] { 
+            background: var(--accent); 
+            color: #0D0F12; /* Dark text on gold button */
+            border: none; 
+            padding: 14px 20px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            width: 100%; 
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+
+        button[type="submit"]:hover { 
+            background: var(--accent-hover); 
+        }
+
+        /* Responsive Gritty Table styling */
+        .bill-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 12px; 
+            font-size: 14px; 
+        }
+
+        .bill-table th, .bill-table td { 
+            text-align: left; 
+            padding: 14px; 
+            border-bottom: 1px solid var(--line); 
+        }
+
+        .bill-table th { 
+            color: var(--ink-soft); 
+            font-weight: 600; 
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .bill-table tr:last-child td {
+            border: none;
+        }
+
+        .amount-highlight {
+            font-family: monospace;
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 15px;
+        }
+
+        /* Status Toggle Button styles */
+        .status-btn { 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            border: 1px solid rgba(245, 158, 11, 0.3); 
+            cursor: pointer; 
+            background: rgba(245, 158, 11, 0.1); 
+            color: var(--accent);
+            font-size: 11px; 
+            font-weight: 600;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .status-btn:hover {
+            background: var(--accent);
+            color: #0D0F12;
+            border-color: var(--accent);
+        }
+
+        /* Paid / Settled Badge State */
+        .status-paid {
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(16, 185, 129, 0.15);
+            color: #10B981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
     </style>
+    <script>
+        (function() {
+            const token = localStorage.getItem('sessionToken');
+            if (!token) {
+                // Eject unauthenticated visitors back to login screen immediately
+                window.location.replace('./login.html'); 
+            }
+        })();
+    </script>
 </head>
 <body>
+
+    <header class="nav-header">
+        <a href="./index.html" class="nav-brand">
+            <span>🏥</span> HIS CLINICAL PORTAL
+        </a>
+        <nav class="nav-links">
+            <a href="./index.html">Registration Desk</a>
+            <a href="./appointments.html">Appointment Board</a>
+            <a href="./billing.html" class="active">Billing Center</a>
+        </nav>
+        <button class="logout-btn" onclick="handleSecureLogout()">Terminate Session</button>
+    </header>
+
     <div class="container">
-        <h1>Invoice & Billing Ledger</h1>
+        <h1>Invoice & Financial Ledger</h1>
         
         <div class="card">
-            <h3>Generate Invoice</h3>
+            <h3>Generate New Invoice</h3>
             <form id="billForm">
                 <div class="form-group">
-                    <label>Patient ID</label>
-                    <input type="number" id="patientId" required>
+                    <label for="patientId">Patient ID Reference</label>
+                    <input type="number" id="patientId" required placeholder="e.g., 42">
                 </div>
                 <div class="form-group">
-                    <label>Service Description</label>
-                    <textarea id="serviceDescription" required rows="2" placeholder="Consultation fee, lab analysis..."></textarea>
+                    <label for="serviceDescription">Provided Medical Services</label>
+                    <textarea id="serviceDescription" required rows="2" placeholder="e.g., General consultation fee, MRI scan, blood analysis panel..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Amount ($)</label>
+                    <label for="amount">Total Amount ($ USD)</label>
                     <input type="number" id="amount" step="0.01" required placeholder="0.00">
                 </div>
                 <button type="submit">Create Bill</button>
@@ -46,20 +281,28 @@
         </div>
 
         <div class="card">
-            <h3>Outstanding Ledger invoices</h3>
+            <h3>Outstanding Ledger Invoices</h3>
             <table class="bill-table">
                 <thead>
                     <tr>
-                        <th>Patient</th>
-                        <th>Description</th>
-                        <th>Amount</th>
-                        <th>Status</th>
+                        <th>Patient File ID</th>
+                        <th>Medical Service Details</th>
+                        <th>Billed Amount</th>
+                        <th>Payment Status</th>
                     </tr>
                 </thead>
-                <tbody id="billEntries"></tbody>
+                <tbody id="billEntries">
+                    </tbody>
             </table>
         </div>
     </div>
+
+    <script>
+        function handleSecureLogout() {
+            localStorage.removeItem('sessionToken');
+            window.location.replace('./login.html');
+        }
+    </script>
     <script src="billing.js"></script>
 </body>
 </html>

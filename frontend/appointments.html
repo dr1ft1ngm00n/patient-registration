@@ -3,42 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Appointment Management</title>
+    <title>HIS — Appointment Board</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #FAF6F0; --panel: #FFFFFF; --ink: #2B2B28; --ink-soft: #6B6962; --sage: #3D5A4C; --line: #E4DFD5; --radius: 10px; }
-        body { background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; margin: 0; padding: 40px 20px; }
-        .container { max-width: 700px; margin: 0 auto; }
-        h1 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 28px; margin-bottom: 24px; }
-        .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
-        .form-group { margin-bottom: 16px; }
-        label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
-        input { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; box-sizing: border-box; }
-        button { background: var(--sage); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; }
-        button:hover { background: #324c40; }
-        .appt-list { list-style: none; padding: 0; }
-        .appt-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; }
-        .appt-item:last-child { border: none; }
-        .status { font-weight: 600; text-transform: uppercase; font-size: 12px; padding: 2px 6px; border-radius: 4px; background: var(--line); }
+        :root { 
+            --bg: #0D0F12;             /* Dark Obsidian background */
+            --panel: #161A20;          /* Deep Slate Panel */
+            --ink: #F3F4F6;            /* Crisp White Text */
+            --ink-soft: #9CA3AF;       /* Soft Gray Secondary Text */
+            --accent: #10B981;         /* Neon Heart-Monitor Emerald */
+            --accent-hover: #059669;   /* Darker Emerald */
+            --line: #242B35;           /* Gritty Border Line */
+            --danger: #EF4444;         /* Cyber Crimson for errors/alerts */
+            --radius: 10px; 
+        }
+
+        body { 
+            background: var(--bg); 
+            color: var(--ink); 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        /* Unified Secure Navigation Bar */
+        .nav-header {
+            background: var(--panel);
+            border-bottom: 2px solid var(--line);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-family: 'Fraunces', serif;
+            font-weight: 500;
+            font-size: 20px;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--ink-soft);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.2s ease;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--ink);
+            background: var(--line);
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: var(--danger);
+            color: var(--ink);
+        }
+
+        /* Main Workspace Content Container */
+        .container { 
+            max-width: 750px; 
+            margin: 40px auto; 
+            padding: 0 20px;
+        }
+
+        h1 { 
+            font-family: 'Fraunces', serif; 
+            font-weight: 500; 
+            font-size: 32px; 
+            margin-bottom: 24px; 
+            border-left: 4px solid var(--accent);
+            padding-left: 12px;
+        }
+
+        .card { 
+            background: var(--panel); 
+            border: 1px solid var(--line); 
+            border-radius: var(--radius); 
+            padding: 28px; 
+            margin-bottom: 28px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            font-family: 'Fraunces', serif;
+            font-size: 20px;
+            color: var(--accent);
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 10px;
+        }
+
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+
+        label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            font-size: 13px; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--ink-soft);
+        }
+
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            background: var(--bg);
+            border: 1px solid var(--line); 
+            border-radius: 6px; 
+            font-family: inherit; 
+            color: var(--ink);
+            box-sizing: border-box; 
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        button[type="submit"] { 
+            background: var(--accent); 
+            color: #0D0F12; /* Dark contrast text on neon green button */
+            border: none; 
+            padding: 14px 20px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            width: 100%; 
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+
+        button[type="submit"]:hover { 
+            background: var(--accent-hover); 
+        }
+
+        .appt-list { 
+            list-style: none; 
+            padding: 0; 
+            margin: 0;
+        }
+
+        .appt-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 16px 0; 
+            border-bottom: 1px solid var(--line); 
+            font-size: 14.5px; 
+        }
+
+        .appt-item:last-child { 
+            border: none; 
+        }
+
+        .appt-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .appt-meta {
+            font-size: 12px;
+            color: var(--ink-soft);
+        }
+
+        .status { 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            font-size: 11px; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            background: rgba(16, 185, 129, 0.15); 
+            color: var(--accent);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
     </style>
+    <script>
+        (function() {
+            const token = localStorage.getItem('sessionToken');
+            if (!token) {
+                // Instantly eject unauthenticated visitors back to login without rendering the UI
+                window.location.replace('./login.html'); 
+            }
+        })();
+    </script>
 </head>
 <body>
+
+    <header class="nav-header">
+        <a href="./index.html" class="nav-brand">
+            <span>🏥</span> HIS CLINICAL PORTAL
+        </a>
+        <nav class="nav-links">
+            <a href="./index.html">Registration Desk</a>
+            <a href="./appointments.html" class="active">Appointment Board</a>
+            <a href="./billing.html">Billing Center</a>
+        </nav>
+        <button class="logout-btn" onclick="handleSecureLogout()">Terminate Session</button>
+    </header>
+
     <div class="container">
-        <h1>Appointment Management</h1>
+        <h1>Clinical Scheduling Console</h1>
         
         <div class="card">
-            <h3>Schedule New Appointment</h3>
+            <h3>Register New Appointment</h3>
             <form id="apptForm">
                 <div class="form-group">
-                    <label>Patient ID</label>
-                    <input type="number" id="patientId" required min="1">
+                    <label for="patientId">Validated Patient ID</label>
+                    <input type="number" id="patientId" required min="1" placeholder="e.g., 42">
                 </div>
                 <div class="form-group">
-                    <label>Doctor Name</label>
-                    <input type="text" id="doctorName" required placeholder="Dr. Smith">
+                    <label for="doctorName">Assigned Clinician</label>
+                    <input type="text" id="doctorName" required placeholder="e.g., Dr. Alexander">
                 </div>
                 <div class="form-group">
-                    <label>Date & Time</label>
+                    <label for="dateTime">Target Date & Time</label>
                     <input type="datetime-local" id="dateTime" required>
                 </div>
                 <button type="submit">Book Appointment</button>
@@ -47,9 +258,17 @@
 
         <div class="card">
             <h3>All Scheduled Appointments</h3>
-            <ul id="apptList" class="appt-list"></ul>
+            <ul id="apptList" class="appt-list">
+                </ul>
         </div>
     </div>
+
+    <script>
+        function handleSecureLogout() {
+            localStorage.removeItem('sessionToken');
+            window.location.replace('./login.html');
+        }
+    </script>
     <script src="appointments.js"></script>
 </body>
 </html>

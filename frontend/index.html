@@ -1,152 +1,315 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Patient Registration Portal</title>
-  <style>
-    /* Clean minimal layout styles for the form structure */
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f8; color: #333; margin: 0; padding: 40px; }
-    .form-container { max-width: 600px; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 0 auto; }
-    h2 { margin-top: 0; color: #111; border-bottom: 2px solid #eaeaea; padding-bottom: 10px; }
-    .form-group { margin-bottom: 20px; display: flex; flex-direction: column; }
-    label { font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
-    input, select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
-    input:focus, select:focus { border-color: #0066cc; outline: none; }
-    button { background: #0066cc; color: #fff; padding: 12px; border: none; border-radius: 4px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-    button:hover { background: #0052a3; }
-    .message { margin-top: 20px; padding: 12px; border-radius: 4px; display: none; }
-    .success { background: #e6f4ea; color: #1e7e34; border: 1px solid #d4edda; }
-    .error { background: #fce8e6; color: #c5221f; border: 1px solid #f8d7da; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HIS — Patient Registration Desk</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --bg: #0D0F12;             /* Dark Obsidian background */
+            --panel: #161A20;          /* Deep Slate Panel */
+            --ink: #F3F4F6;            /* Crisp White Text */
+            --ink-soft: #9CA3AF;       /* Soft Gray Secondary Text */
+            --accent: #10B981;         /* Neon Heart-Monitor Emerald */
+            --accent-hover: #059669;   /* Darker Emerald */
+            --line: #242B35;           /* Gritty Border Line */
+            --danger: #EF4444;         /* Cyber Crimson for alerts/logout */
+            --radius: 10px; 
+        }
+
+        body { 
+            background: var(--bg); 
+            color: var(--ink); 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        /* Unified Secure Navigation Bar */
+        .nav-header {
+            background: var(--panel);
+            border-bottom: 2px solid var(--line);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-family: 'Fraunces', serif;
+            font-weight: 500;
+            font-size: 20px;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--ink-soft);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.2s ease;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--ink);
+            background: var(--line);
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: var(--danger);
+            color: var(--ink);
+        }
+
+        /* Main Workspace Content Container */
+        .container { 
+            max-width: 750px; 
+            margin: 40px auto; 
+            padding: 0 20px;
+        }
+
+        h1 { 
+            font-family: 'Fraunces', serif; 
+            font-weight: 500; 
+            font-size: 32px; 
+            margin-bottom: 24px; 
+            border-left: 4px solid var(--accent);
+            padding-left: 12px;
+        }
+
+        .card { 
+            background: var(--panel); 
+            border: 1px solid var(--line); 
+            border-radius: var(--radius); 
+            padding: 28px; 
+            margin-bottom: 28px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            font-family: 'Fraunces', serif;
+            font-size: 20px;
+            color: var(--accent);
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+
+        /* Span inputs across full width when needed */
+        .full-width {
+            grid-column: span 2;
+        }
+
+        label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            font-size: 13px; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--ink-soft);
+        }
+
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            background: var(--bg);
+            border: 1px solid var(--line); 
+            border-radius: 6px; 
+            font-family: inherit; 
+            color: var(--ink);
+            box-sizing: border-box; 
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        button[type="submit"] { 
+            background: var(--accent); 
+            color: #0D0F12; 
+            border: none; 
+            padding: 14px 20px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            width: 100%; 
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+
+        button[type="submit"]:hover { 
+            background: var(--accent-hover); 
+        }
+
+        /* Alert Box for showing the newly generated Patient ID */
+        .success-banner {
+            display: none;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .success-banner strong {
+            font-size: 16px;
+        }
+    </style>
+    <script>
+        (function() {
+            const token = localStorage.getItem('sessionToken');
+            if (!token) {
+                // Instantly eject unauthenticated visitors back to login without rendering the UI
+                window.location.replace('./login.html'); 
+            }
+        })();
+    </script>
 </head>
 <body>
 
-<div class="form-container">
-  <h2>Patient Registration</h2>
-  <form id="registrationForm">
-    
-    <div class="form-group">
-      <label for="firstName">First Name</label>
-      <input type="text" id="firstName" name="firstName" required>
+    <header class="nav-header">
+        <a href="./index.html" class="nav-brand">
+            <span>🏥</span> HIS CLINICAL PORTAL
+        </a>
+        <nav class="nav-links">
+            <a href="./index.html" class="active">Registration Desk</a>
+            <a href="./appointments.html">Appointment Board</a>
+            <a href="./billing.html">Billing Center</a>
+        </nav>
+        <button class="logout-btn" onclick="handleSecureLogout()">Terminate Session</button>
+    </header>
+
+    <div class="container">
+        <h1>Patient Admissions</h1>
+
+        <div id="successBanner" class="success-banner">
+            <strong>✅ Registration Complete!</strong><br>
+            Write down the assigned ID below to schedule appointments or generate invoices:<br>
+            <span style="font-family: monospace; font-size: 18px; font-weight: bold;" id="assignedPatientId">ID: --</span>
+        </div>
+        
+        <div class="card">
+            <h3>New Patient File intake</h3>
+            <form id="registerForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" required placeholder="John">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" required placeholder="Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="dob">Date of Birth</label>
+                        <input type="date" id="dob" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Contact Number</label>
+                        <input type="tel" id="phone" required placeholder="(555) 019-2834">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="insuranceId">Insurance Provider ID / Policy Number</label>
+                        <input type="text" id="insuranceId" required placeholder="e.g., INS-99281-A">
+                    </div>
+                </div>
+                <button type="submit">Admit Patient</button>
+            </form>
+        </div>
     </div>
 
-    <div class="form-group">
-      <label for="lastName">Last Name</label>
-      <input type="text" id="lastName" name="lastName" required>
-    </div>
+    <script>
+        function handleSecureLogout() {
+            localStorage.removeItem('sessionToken');
+            window.location.replace('./login.html');
+        }
 
-    <div class="form-group">
-      <label for="dateOfBirth">Date of Birth</label>
-      <input type="date" id="dateOfBirth" name="dateOfBirth" required>
-    </div>
+        // Connect the client-side JavaScript to send data to server.js
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const payload = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                dob: document.getElementById('dob').value,
+                phone: document.getElementById('phone').value,
+                insuranceId: document.getElementById('insuranceId').value
+            };
 
-    <div class="form-group">
-      <label for="gender">Gender</label>
-      <select id="gender" name="gender" required>
-        <option value="" disabled selected>-- Select Patient Gender --</option>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-        <option value="other">Other / Non-binary</option>
-      </select>
-    </div>
+            const token = localStorage.getItem('sessionToken');
 
-    <div class="form-group">
-      <label for="email">Email Address</label>
-      <input type="email" id="email" name="email" required>
-    </div>
+            try {
+                const res = await fetch('http://localhost:3001/api/patients', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-    <div class="form-group">
-      <label for="phone">Phone Number</label>
-      <input type="tel" id="phone" name="phone" required>
-    </div>
+                if (res.ok) {
+                    const data = await res.json();
+                    
+                    // Show success banner with the real database-generated Patient ID
+                    const banner = document.getElementById('successBanner');
+                    const idSpan = document.getElementById('assignedPatientId');
+                    idSpan.textContent = `PATIENT ID: ${data.id}`;
+                    banner.style.display = 'block';
 
-    <div class="form-group">
-      <label for="addressLine1">Address Line 1</label>
-      <input type="text" id="addressLine1" name="addressLine1" required>
-    </div>
-
-    <div class="form-group">
-      <label for="addressLine2">Address Line 2 (Optional)</label>
-      <input type="text" id="addressLine2" name="addressLine2">
-    </div>
-
-    <div class="form-group">
-      <label for="city">City</label>
-      <input type="text" id="city" name="city" required>
-    </div>
-
-    <div class="form-group">
-      <label for="state">State</label>
-      <input type="text" id="state" name="state" required>
-    </div>
-
-    <div class="form-group">
-      <label for="postalCode">Postal / ZIP Code</label>
-      <input type="text" id="postalCode" name="postalCode" required>
-    </div>
-
-    <div class="form-group">
-      <label for="country">Country</label>
-      <input type="text" id="country" name="country" required>
-    </div>
-
-    <div class="form-group">
-      <label for="insuranceProvider">Insurance Provider</label>
-      <input type="text" id="insuranceProvider" name="insuranceProvider" required>
-    </div>
-
-    <div class="form-group">
-      <label for="insuranceMemberId">Insurance Policy Member ID</label>
-      <input type="text" id="insuranceMemberId" name="insuranceMemberId" required>
-    </div>
-
-    <button type="submit">Register Patient File</button>
-  </form>
-
-  <div id="responseMessage" class="message"></div>
-</div>
-
-<script>
-  // 🛡️ Security Route Guard: Prevent unauthenticated dashboard access
-  if (!localStorage.getItem('sessionToken')) {
-      window.location.href = './login.html';
-  }
-
-  // Handle transaction submission
-  document.getElementById('registrationForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const messageDiv = document.getElementById('responseMessage');
-    messageDiv.style.display = 'none';
-
-    // Pack the standard structured form fields up cleanly
-    const formData = new FormData(e.target);
-    const payload = Object.fromEntries(formData.entries());
-
-    try {
-      // Direct transaction payload dispatch to our Express server engine
-      const response = await fetch('http://localhost:3001/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        messageDiv.className = 'message success';
-        messageDiv.textContent = `Success! Patient registered safely. System Assignment ID: ${data.patientId}`;
-        e.target.reset();
-      } else {
-        messageDiv.className = 'message error';
-        messageDiv.textContent = data.error || 'An operational verification error occurred.';
-      }
-    } catch (err) {
-      messageDiv.className = 'message error';
-      messageDiv.textContent = 'Unable to reach backend network registration services.';
-    }
-    messageDiv.style.display = 'block';
-  });
-</script>
+                    // Reset form and scroll to top to see the ID banner
+                    document.getElementById('registerForm').reset();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    const err = await res.json();
+                    alert(`Admission failed: ${err.error || 'Check server logs.'}`);
+                }
+            } catch (err) {
+                alert('Connection to API gateway timed out.');
+            }
+        });
+    </script>
 </body>
 </html>
