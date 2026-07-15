@@ -15,7 +15,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
     try {
         // 🎯 Direct transaction payload dispatch to our Express server engine on port 3001
-        const response = await fetch('https://wet-zebras-attack.loca.lt/api/login', {
+        const response = await fetch('https://wet-zebras-attack.loca.lt/api/patients/api/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
