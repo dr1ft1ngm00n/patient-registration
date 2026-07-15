@@ -3,209 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HIS — Patient Registration Desk</title>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root { 
-            --bg: #0D0F12;             /* Dark Obsidian background */
-            --panel: #161A20;          /* Deep Slate Panel */
-            --ink: #F3F4F6;            /* Crisp White Text */
-            --ink-soft: #9CA3AF;       /* Soft Gray Secondary Text */
-            --accent: #10B981;         /* Neon Heart-Monitor Emerald */
-            --accent-hover: #059669;   /* Darker Emerald */
-            --line: #242B35;           /* Gritty Border Line */
-            --danger: #EF4444;         /* Cyber Crimson for alerts/logout */
-            --radius: 10px; 
-        }
-
-        body { 
-            background: var(--bg); 
-            color: var(--ink); 
-            font-family: 'Inter', sans-serif; 
-            margin: 0; 
-            padding: 0; 
-        }
-
-        /* Unified Secure Navigation Bar */
-        .nav-header {
-            background: var(--panel);
-            border-bottom: 2px solid var(--line);
-            padding: 15px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-brand {
-            font-family: 'Fraunces', serif;
-            font-weight: 500;
-            font-size: 20px;
-            color: var(--accent);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 20px;
-        }
-
-        .nav-links a {
-            color: var(--ink-soft);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 14px;
-            transition: color 0.2s ease;
-            padding: 8px 12px;
-            border-radius: 6px;
-        }
-
-        .nav-links a:hover, .nav-links a.active {
-            color: var(--ink);
-            background: var(--line);
-        }
-
-        .logout-btn {
-            background: transparent;
-            border: 1px solid var(--danger);
-            color: var(--danger);
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-
-        .logout-btn:hover {
-            background: var(--danger);
-            color: var(--ink);
-        }
-
-        /* Main Workspace Content Container */
-        .container { 
-            max-width: 750px; 
-            margin: 40px auto; 
-            padding: 0 20px;
-        }
-
-        h1 { 
-            font-family: 'Fraunces', serif; 
-            font-weight: 500; 
-            font-size: 32px; 
-            margin-bottom: 24px; 
-            border-left: 4px solid var(--accent);
-            padding-left: 12px;
-        }
-
-        .card { 
-            background: var(--panel); 
-            border: 1px solid var(--line); 
-            border-radius: var(--radius); 
-            padding: 28px; 
-            margin-bottom: 28px; 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-        }
-
-        .card h3 {
-            margin-top: 0;
-            font-family: 'Fraunces', serif;
-            font-size: 20px;
-            color: var(--accent);
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--line);
-            padding-bottom: 10px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .form-group { 
-            margin-bottom: 20px; 
-        }
-
-        /* Span inputs across full width when needed */
-        .full-width {
-            grid-column: span 2;
-        }
-
-        label { 
-            display: block; 
-            font-weight: 600; 
-            margin-bottom: 8px; 
-            font-size: 13px; 
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--ink-soft);
-        }
-
-        input, select { 
-            width: 100%; 
-            padding: 12px; 
-            background: var(--bg);
-            border: 1px solid var(--line); 
-            border-radius: 6px; 
-            font-family: inherit; 
-            color: var(--ink);
-            box-sizing: border-box; 
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
-        }
-
-        button[type="submit"] { 
-            background: var(--accent); 
-            color: #0D0F12; 
-            border: none; 
-            padding: 14px 20px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            width: 100%; 
-            font-size: 15px;
-            transition: background 0.2s;
-        }
-
-        button[type="submit"]:hover { 
-            background: var(--accent-hover); 
-        }
-
-        /* Alert Box for showing the newly generated Patient ID */
-        .success-banner {
-            display: none;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 16px;
-            border-radius: 6px;
-            margin-bottom: 24px;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .success-banner strong {
-            font-size: 16px;
-        }
-    </style>
-    <script>
-        (function() {
-            const token = localStorage.getItem('sessionToken');
-            if (!token) {
-                // Instantly eject unauthenticated visitors back to login without rendering the UI
-                window.location.replace('./login.html'); 
-            }
-        })();
-    </script>
+    <title>HIS Clinical Portal - Registration Desk</title>
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
 
@@ -224,14 +23,14 @@
     <div class="container">
         <h1>Patient Admissions</h1>
 
-        <div id="successBanner" class="success-banner">
-            <strong>✅ Registration Complete!</strong><br>
-            Write down the assigned ID below to schedule appointments or generate invoices:<br>
+        <div id="successBanner" style="display: none; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 15px; margin-bottom: 20px; border-radius: 6px;">
+            <strong>✅ Registration Successful!</strong><br>
+            The patient has been safely admitted to the HIS system database.<br>
             <span style="font-family: monospace; font-size: 18px; font-weight: bold;" id="assignedPatientId">ID: --</span>
         </div>
         
         <div class="card">
-            <h3>New Patient File intake</h3>
+            <h3>New Patient File Intake</h3>
             <form id="registerForm">
                 <div class="form-grid">
                     <div class="form-group">
@@ -250,35 +49,144 @@
                         <label for="phone">Contact Number</label>
                         <input type="tel" id="phone" required placeholder="(555) 019-2834">
                     </div>
-                    <div class="form-group full-width">
-                        <label for="insuranceId">Insurance Provider ID / Policy Number</label>
+                    <div class="form-group">
+                        <label for="email">Contact Email (Parent/Guardian ok)</label>
+                        <input type="email" id="email" placeholder="parent@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="insuranceId">Insurance Member ID / Policy Number</label>
                         <input type="text" id="insuranceId" required placeholder="e.g., INS-99281-A">
                     </div>
+                    
+                    <div class="form-group full-width" style="margin-top: 10px; border-top: 1px solid var(--line); padding-top: 15px;">
+                        <label for="addressLine1">Street Address</label>
+                        <input type="text" id="addressLine1" required placeholder="123 Health Ave">
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city" required placeholder="Metropolis">
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <input type="text" id="state" required placeholder="NY">
+                    </div>
+                    <div class="form-group">
+                        <label for="postalCode">Postal Code</label>
+                        <input type="text" id="postalCode" required placeholder="10001">
+                    </div>
                 </div>
-                <button type="submit">Admit Patient</button>
+                <button type="submit" style="margin-top: 15px;">Admit Patient</button>
             </form>
+        </div>
+
+        <div class="card">
+            <h3>Admitted Patient Directory</h3>
+            <style>
+                .patient-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+                .patient-table th, .patient-table td { text-align: left; padding: 14px; border-bottom: 1px solid var(--line); }
+                .patient-table th { color: var(--ink-soft); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+                .patient-table tr:last-child td { border: none; }
+                .id-badge { background: var(--line); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-weight: bold; }
+            </style>
+            <table class="patient-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>DOB</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Policy ID</th>
+                    </tr>
+                </thead>
+                <tbody id="patientEntries">
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--ink-soft);">Loading admitted records...</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
     <script>
+        // Terminate session and clean storage key
         function handleSecureLogout() {
             localStorage.removeItem('sessionToken');
             window.location.replace('./login.html');
         }
 
-        // Connect the client-side JavaScript to send data to server.js
+        const token = localStorage.getItem('sessionToken');
+
+        // Redirect if session is non-existent
+        if (!token) {
+            window.location.replace('./login.html');
+        }
+
+        // 🔄 Read/Load Patient Directory from API
+        async function loadPatients() {
+            try {
+                const res = await fetch('http://localhost:3001/api/patients', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!res.ok) {
+                    console.error('Failed to load patient records.');
+                    return;
+                }
+
+                const patients = await res.json();
+                const container = document.getElementById('patientEntries');
+
+                if (!patients || patients.length === 0) {
+                    container.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--ink-soft);">No patient records in database.</td></tr>`;
+                    return;
+                }
+
+                container.innerHTML = patients.map(p => {
+                    const formattedDob = new Date(p.dateOfBirth).toLocaleDateString(undefined, {
+                        dateStyle: 'medium'
+                    });
+
+                    // Cleanly format structural address lines
+                    const fullAddress = `${p.addressLine1}, ${p.city}, ${p.state} ${p.postalCode}`;
+
+                    return `
+                        <tr>
+                            <td><span class="id-badge">${p.id}</span></td>
+                            <td><strong>🏥 ${p.firstName} ${p.lastName}</strong></td>
+                            <td>${formattedDob}</td>
+                            <td>${p.phone}</td>
+                            <td>${fullAddress}</td>
+                            <td style="color: var(--ink-soft); font-family: monospace;">${p.insuranceMemberId}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error('Error fetching patient records:', err);
+            }
+        }
+
+        // Handle Patient Intake Form Submission
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            // Gather input values including the email and structural address fields
             const payload = {
                 firstName: document.getElementById('firstName').value,
                 lastName: document.getElementById('lastName').value,
                 dob: document.getElementById('dob').value,
                 phone: document.getElementById('phone').value,
-                insuranceId: document.getElementById('insuranceId').value
+                email: document.getElementById('email').value,
+                insuranceId: document.getElementById('insuranceId').value,
+                addressLine1: document.getElementById('addressLine1').value,
+                city: document.getElementById('city').value,
+                state: document.getElementById('state').value,
+                postalCode: document.getElementById('postalCode').value
             };
-
-            const token = localStorage.getItem('sessionToken');
 
             try {
                 const res = await fetch('http://localhost:3001/api/patients', {
@@ -293,14 +201,18 @@
                 if (res.ok) {
                     const data = await res.json();
                     
-                    // Show success banner with the real database-generated Patient ID
+                    // Force success banner display
                     const banner = document.getElementById('successBanner');
                     const idSpan = document.getElementById('assignedPatientId');
-                    idSpan.textContent = `PATIENT ID: ${data.id}`;
+                    idSpan.textContent = `ASSIGNED PATIENT ID: ${data.id}`;
                     banner.style.display = 'block';
 
-                    // Reset form and scroll to top to see the ID banner
+                    // Secure browser popup guarantee
+                    alert(`Success! Patient Registered with ID: ${data.id}`);
+
+                    // Reset fields and run dynamic table update immediately
                     document.getElementById('registerForm').reset();
+                    loadPatients(); 
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
                     const err = await res.json();
@@ -310,6 +222,9 @@
                 alert('Connection to API gateway timed out.');
             }
         });
+
+        // Initialize directory load when page opens
+        loadPatients();
     </script>
 </body>
 </html>

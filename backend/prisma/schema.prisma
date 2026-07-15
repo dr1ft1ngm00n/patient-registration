@@ -16,26 +16,26 @@ model Patient {
   lastName          String
   dateOfBirth       DateTime
   
-  // 🔗 Cleaned-up Master Data Relation
+  // 1. Remove the @unique keyword from here 👇
+  email             String        
+  
+  phone             String
+  insuranceProvider String
+  insuranceMemberId String
   genderId          Int
   genderRef         GenderMaster  @relation(fields: [genderId], references: [id])
-
-  email             String        @unique
-  phone             String
-
   addressLine1      String
-  addressLine2      String?
   city              String
   state             String
   postalCode        String
   country           String
-
-  insuranceProvider String
-  insuranceMemberId String        @db.VarChar(255)
-
   createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
   appointments      Appointment[]
   bills             Bill[]
+
+  // This guarantees that Name + DOB combination must be unique!
+  @@unique([firstName, lastName, dateOfBirth])
 }
 
 enum Role {

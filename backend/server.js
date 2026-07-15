@@ -110,30 +110,63 @@ app.get('/api/patients', authenticateToken, async (req, res) => {
 });
 
 // 2. POST: Admit a new patient (Requires Session Token)
+// POST: Admit a new patient (Handles shared parent/guardian emails gracefully)
 app.post('/api/patients', authenticateToken, async (req, res) => {
-    const { firstName, lastName, dob, phone, insuranceId } = req.body;
+    const { 
+        firstName, 
+        lastName, 
+        dob, 
+        phone, 
+        insuranceId, 
+        addressLine1, 
+        city, 
+        state, 
+        postalCode,
+        email // 👈 Receive the email directly from the form body
+    } = req.body;
+
     try {
+        const parsedDob = new Date(dob);
+
+        // 1. Check if a patient with the exact same Name + DOB already exists
+        const existingPatient = await prisma.patient.findFirst({
+            where: {
+                firstName: { equals: firstName, mode: 'insensitive' },
+                lastName: { equals: lastName, mode: 'insensitive' },
+                dateOfBirth: parsedDob
+            }
+        });
+
+        if (existingPatient) {
+            return res.status(400).json({ 
+                error: `Admission rejected: A patient named "${firstName} ${lastName}" with Date of Birth (${dob}) is already registered in the system.` 
+            });
+        }
+
+        // 2. If unique, proceed with creation (allowing shared emails!)
         const newPatient = await prisma.patient.create({
             data: {
                 firstName,
                 lastName,
-                dateOfBirth: new Date(dob), // Parse date string to strict DateTime object
+                dateOfBirth: parsedDob,
                 phone,
                 insuranceProvider: 'Default Provider', 
                 insuranceMemberId: insuranceId,
-                email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}-${Date.now()}@clinic.local`, // Auto-generate unique email to satisfy @unique constraint
-                genderId: 1, // Defaulting to Male (ID: 1) from seed database configurations
-                addressLine1: 'Temporary Intake Address',
-                city: 'City',
-                state: 'State',
-                postalCode: '00000',
+                // Fallback to a clinic email if no email was entered, otherwise use the parent's/shared email
+                email: email ? email.trim().toLowerCase() : `${firstName.toLowerCase()}.${lastName.toLowerCase()}@clinic.local`,
+                genderId: 1, 
+                addressLine1: addressLine1 || 'Temporary Intake Address',
+                city: city || 'City',
+                state: state || 'State',
+                postalCode: postalCode || '00000',
                 country: 'US'
             }
         });
+
         res.status(201).json(newPatient);
     } catch (err) {
-        console.error(err);
-        res.status(400).json({ error: 'Failed to admit patient. Database parameters missing or malformed.' });
+        console.error("Admissions Error: ", err);
+        res.status(500).json({ error: 'Failed to complete admission file processing.' });
     }
 });
 
