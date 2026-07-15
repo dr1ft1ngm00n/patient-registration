@@ -1,5 +1,5 @@
 // 🎯 Explicitly target the Express API gateway port running in your Docker container
-const API_BASE_URL = 'https://wet-zebras-attack.loca.lt/api/patients/api';
+const API_BASE_URL = 'http://localhost:3001/api/patients/api';
 
 // Helper function to retrieve active session header configurations
 function getAuthHeaders() {

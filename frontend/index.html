@@ -320,7 +320,7 @@
         // 🔄 Read/Load Patient Directory from API
         async function loadPatients() {
             try {
-                const res = await fetch('https://wet-zebras-attack.loca.lt/api/patients/api/patients', {
+                const res = await fetch('http://localhost:3001/api/patients/api/patients', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -384,7 +384,7 @@
             };
 
             try {
-                const res = await fetch('https://wet-zebras-attack.loca.lt/api/patients/api/patients', {
+                const res = await fetch('http://localhost:3001/api/patients/api/patients', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
