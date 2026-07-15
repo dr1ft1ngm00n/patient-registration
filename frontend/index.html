@@ -4,7 +4,209 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HIS Clinical Portal - Registration Desk</title>
-    <link rel="stylesheet" href="style.css"> 
+    <style>
+        /* Modern, Clean Clinical UI System Styles */
+        :root {
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --primary: #0284c7;
+            --primary-hover: #0369a1;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success-bg: #f0fdf4;
+            --success-border: #bbf7d0;
+            --success-text: #166534;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+        }
+
+        /* Nav Header Layout */
+        .nav-header {
+            background-color: #0f172a;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.8rem 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-brand {
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-decoration: none;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #ffffff;
+        }
+
+        .logout-btn {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .logout-btn:hover {
+            background-color: #dc2626;
+        }
+
+        /* Container & Cards Layout */
+        .container {
+            max-width: 1100px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            color: #0f172a;
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            color: #1e293b;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 0.75rem;
+        }
+
+        /* Grid-based Form Controls */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        input {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background-color: #fafafa;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        button[type="submit"] {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+
+        button[type="submit"]:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Styled Tabular Directory */
+        .patient-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        .patient-table th, .patient-table td {
+            text-align: left;
+            padding: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .patient-table th {
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            background-color: #f1f5f9;
+        }
+
+        .patient-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .id-badge {
+            background: #e2e8f0;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-weight: 700;
+            color: #334155;
+        }
+    </style>
 </head>
 <body>
 
@@ -23,7 +225,7 @@
     <div class="container">
         <h1>Patient Admissions</h1>
 
-        <div id="successBanner" style="display: none; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 15px; margin-bottom: 20px; border-radius: 6px;">
+        <div id="successBanner" style="display: none; background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border); padding: 15px; margin-bottom: 20px; border-radius: 6px;">
             <strong>✅ Registration Successful!</strong><br>
             The patient has been safely admitted to the HIS system database.<br>
             <span style="font-family: monospace; font-size: 18px; font-weight: bold;" id="assignedPatientId">ID: --</span>
@@ -58,7 +260,7 @@
                         <input type="text" id="insuranceId" required placeholder="e.g., INS-99281-A">
                     </div>
                     
-                    <div class="form-group full-width" style="margin-top: 10px; border-top: 1px solid var(--line); padding-top: 15px;">
+                    <div class="form-group full-width" style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 15px;">
                         <label for="addressLine1">Street Address</label>
                         <input type="text" id="addressLine1" required placeholder="123 Health Ave">
                     </div>
@@ -81,13 +283,6 @@
 
         <div class="card">
             <h3>Admitted Patient Directory</h3>
-            <style>
-                .patient-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
-                .patient-table th, .patient-table td { text-align: left; padding: 14px; border-bottom: 1px solid var(--line); }
-                .patient-table th { color: var(--ink-soft); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
-                .patient-table tr:last-child td { border: none; }
-                .id-badge { background: var(--line); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-weight: bold; }
-            </style>
             <table class="patient-table">
                 <thead>
                     <tr>
@@ -101,7 +296,7 @@
                 </thead>
                 <tbody id="patientEntries">
                     <tr>
-                        <td colspan="6" style="text-align: center; color: var(--ink-soft);">Loading admitted records...</td>
+                        <td colspan="6" style="text-align: center; color: var(--text-muted);">Loading admitted records...</td>
                     </tr>
                 </tbody>
             </table>
@@ -141,7 +336,7 @@
                 const container = document.getElementById('patientEntries');
 
                 if (!patients || patients.length === 0) {
-                    container.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--ink-soft);">No patient records in database.</td></tr>`;
+                    container.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No patient records in database.</td></tr>`;
                     return;
                 }
 
@@ -160,7 +355,7 @@
                             <td>${formattedDob}</td>
                             <td>${p.phone}</td>
                             <td>${fullAddress}</td>
-                            <td style="color: var(--ink-soft); font-family: monospace;">${p.insuranceMemberId}</td>
+                            <td style="color: var(--text-muted); font-family: monospace;">${p.insuranceMemberId}</td>
                         </tr>
                     `;
                 }).join('');
