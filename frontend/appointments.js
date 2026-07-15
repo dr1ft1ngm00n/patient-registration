@@ -1,5 +1,5 @@
 // 🎯 Explicitly target the Express API gateway port running in your Docker container
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = 'https://dr1ft1ngm00n.github.io/patient-registration/api';
 
 // helper function to retrieve active session header configurations
 function getAuthHeaders() {
