@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: kali
     ports:
-      - "5432:5432" # Access directly from your local IDE/Apps
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
