@@ -1,5 +1,5 @@
-// 🎯 Explicitly target the Express API gateway port running in your Docker container
-const API_BASE_URL = 'http://localhost:3001/api/patients/api';
+// 🎯 Updated to use relative path for Nginx reverse proxy
+const API_BASE_URL = '/api';
 
 // Helper function to retrieve active session header configurations
 function getAuthHeaders() {
@@ -14,7 +14,6 @@ function getAuthHeaders() {
 document.getElementById('billForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    // Normalize patientId to an integer to match the database schemas
     const rawPatientId = document.getElementById('patientId').value;
     const payload = {
         patientId: Number(rawPatientId),
@@ -64,7 +63,6 @@ async function loadBills() {
         }
 
         container.innerHTML = bills.map(b => {
-            // Safely fall back if patient relation database joins are not loaded
             const patientDisplayName = b.patient 
                 ? `${b.patient.firstName} ${b.patient.lastName}` 
                 : `Patient ID #${b.patientId}`;
@@ -93,7 +91,7 @@ async function loadBills() {
     }
 }
 
-// 🔄 Update / Patch Payment Status (OWASP A01: Broken Access Control Guard)
+// 🔄 Update / Patch Payment Status
 async function toggleBillStatus(id, currentStatus) {
     const nextStatus = currentStatus === 'PAID' ? 'UNPAID' : 'PAID';
     

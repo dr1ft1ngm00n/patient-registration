@@ -1,5 +1,5 @@
-// 🎯 Explicitly target the Express API gateway port running in your Docker container
-const API_BASE_URL = 'http://localhost:3001/api/patients/api';
+// 🎯 Use absolute relative path '/api' to ensure Nginx proxy catches it regardless of page depth
+const API_BASE_URL = '/api';
 
 // helper function to retrieve active session header configurations
 function getAuthHeaders() {
@@ -14,7 +14,6 @@ function getAuthHeaders() {
 document.getElementById('apptForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    // Normalize patientId to an integer so it matches Prisma/PostgreSQL schema types (CWE-20)
     const rawPatientId = document.getElementById('patientId').value;
     const payload = {
         patientId: Number(rawPatientId), 
@@ -64,12 +63,10 @@ async function loadAppointments() {
         }
 
         container.innerHTML = appts.map(a => {
-            // Safely verify if patient relationship is populated, fallback to raw patient ID
             const patientDisplayName = a.patient 
                 ? `${a.patient.firstName} ${a.patient.lastName}` 
                 : `Patient Record ID #${a.patientId}`;
 
-            // Format date correctly according to localized client locale
             const formattedDate = new Date(a.dateTime).toLocaleString(undefined, {
                 dateStyle: 'medium',
                 timeStyle: 'short'

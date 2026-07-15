@@ -2,8 +2,7 @@ const form = document.getElementById("registrationForm");
 const statusBanner = document.getElementById("statusBanner");
 const submitButton = document.getElementById("submitButton");
 
-// Human-readable labels for error messages, since the API returns field
-// keys like "insuranceMemberId" but we want to show "Member ID" to the user.
+// Human-readable labels for error messages
 const fieldLabels = {
   firstName: "First name",
   lastName: "Last name",
@@ -18,6 +17,9 @@ const fieldLabels = {
   insuranceProvider: "Insurance provider",
   insuranceMemberId: "Member ID",
 };
+
+// --- Updated API Base ---
+const API_BASE_URL = "/api"; 
 
 function clearFieldErrors() {
   document.querySelectorAll(".field-error").forEach((el) => (el.textContent = ""));
@@ -55,7 +57,8 @@ form.addEventListener("submit", async (event) => {
   const data = Object.fromEntries(formData.entries());
 
   try {
-    const response = await fetch("/register", {
+    // --- Updated Fetch call with API_BASE_URL ---
+    const response = await fetch(`${API_BASE_URL}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -67,7 +70,7 @@ form.addEventListener("submit", async (event) => {
       showBanner(
         "success",
         "You're registered.",
-        `A confirmation has been recorded under reference #${body.patientId}.`
+        `A confirmation has been recorded under reference #${body.patientId || 'N/A'}.`
       );
       form.reset();
       document
@@ -91,9 +94,6 @@ form.addEventListener("submit", async (event) => {
   }
 });
 
-// Light progress-indicator interaction: fill a section's segment once every
-// field inside it has a non-empty value. Purely visual encouragement, not
-// a validation mechanism — the server is still the real source of truth.
 const sections = document.querySelectorAll("fieldset[data-section]");
 const segments = document.querySelectorAll(".progress-segment");
 
