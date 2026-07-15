@@ -15,12 +15,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'clinical-portal-jwt-super-secret-k
 // =========================================================================
 
 // Configured to match secure local containers and cross-origin settings
+a// Simplest and most robust approach for a proxied setup
 app.use(cors({
-    origin: [
-        'http://localhost:3000',               // Local development port
-        'http://127.0.0.1:5500',               // Common Live Server port
-        'https://dr1ft1ngm00n.github.io'       // Secure production web deployment
-    ],
+    origin: '*', // Allows all origins; since Nginx controls access, this is safe
     credentials: true
 }));
 

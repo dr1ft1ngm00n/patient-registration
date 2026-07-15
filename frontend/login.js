@@ -14,8 +14,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     msgDiv.className = 'message';
 
     try {
-        // 🎯 Direct transaction payload dispatch to our Express server engine on port 3001
-        const response = await fetch('http://localhost:3001/api/patients/api/login', {
+        const response = await fetch('/api/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
