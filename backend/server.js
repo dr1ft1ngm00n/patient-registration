@@ -17,7 +17,11 @@ const JWT_SECRET = process.env.JWT_SECRET || 'clinical-portal-jwt-super-secret-k
 // Configured to match secure local containers and cross-origin settings
 a// Simplest and most robust approach for a proxied setup
 app.use(cors({
-    origin: ['http://localhost:5500', 'http://127.0.0.1:5500'],
+    origin: [
+        'http://localhost:5500', // Common Live Server port
+        'http://127.0.0.1:5500', 
+        'http://localhost:3000'  // If you use a different dev server
+    ],
     credentials: true
 }));
 app.use(express.json());
