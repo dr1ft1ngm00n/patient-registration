@@ -14,13 +14,12 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     msgDiv.className = 'message';
 
     try {
-        const response = await fetch('/api/login', {
+        // Change this back to your local backend server
+        const response = await fetch('http://localhost:3001/api/login', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
-        });
+}       );
 
         const data = await response.json();
 

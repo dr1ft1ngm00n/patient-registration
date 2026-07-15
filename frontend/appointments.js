@@ -1,5 +1,6 @@
 // 🎯 Use absolute relative path '/api' to ensure Nginx proxy catches it regardless of page depth
-const API_BASE_URL = '/api';
+// Change the base URL to your local backend
+const API_BASE_URL = 'http://localhost:3001/api';
 
 // helper function to retrieve active session header configurations
 function getAuthHeaders() {

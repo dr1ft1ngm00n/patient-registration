@@ -1,5 +1,6 @@
 // 🎯 Updated to use relative path for Nginx reverse proxy
-const API_BASE_URL = '/api';
+// Change the base URL to your local backend
+const API_BASE_URL = 'http://localhost:3001/api';
 
 // Helper function to retrieve active session header configurations
 function getAuthHeaders() {
