@@ -1,5 +1,4 @@
 services:
-
   # --- PostgreSQL database ---
   db:
     image: postgres:16-alpine
@@ -9,53 +8,14 @@ services:
       POSTGRES_DB: patient_registration
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: kali
+    ports:
+      - "5432:5432" # Access directly from your local IDE/Apps
     volumes:
-      - postgres_data:/var/lib/postgresql/data # 💾 Protected local persistent engine
-    ports:
-      - "5432:5432"
-    networks:
-      - his_network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # --- Backend (Node/Express) ---
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
-    container_name: his_backend
-    restart: unless-stopped
-    ports:
-      - "3001:3001"
-    environment:
-      - DATABASE_URL=postgresql://postgres:kali@db:5432/patient_registration
-      - ENCRYPTION_KEY=9de9f02c659811daf1bf74da429923b7686952482bbf85fcb7d201f481008c30
-      - SESSION_SECRET=f5f165dc2ea734c07fa5fbfeca3d1efef3100b8a714d26f4e1f0f68906e7197e
-      - NODE_ENV=production
-    depends_on:
-      db:
-        condition: service_healthy
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - his_network
 
-  # --- Frontend (nginx serving static files) ---
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-    container_name: his_frontend
-    restart: unless-stopped
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-    networks:
-      - his_network
-
-  # --- pgAdmin (database GUI) ---
+  # --- pgAdmin (Database GUI) ---
   pgadmin:
     image: dpage/pgadmin4
     container_name: his_pgadmin
@@ -66,7 +26,7 @@ services:
     ports:
       - "5050:80"
     volumes:
-      - pgadmin_data:/var/lib/pgadmin # 🛠️ Keeps pgAdmin servers saved
+      - pgadmin_data:/var/lib/pgadmin
     networks:
       - his_network
 
@@ -74,9 +34,6 @@ networks:
   his_network:
     driver: bridge
 
-# 🔒 Named Volumes: This tells Docker to never wipe these folders on 'down'
 volumes:
   postgres_data:
-    driver: local
   pgadmin_data:
-    driver: local

@@ -17,10 +17,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'clinical-portal-jwt-super-secret-k
 // Configured to match secure local containers and cross-origin settings
 a// Simplest and most robust approach for a proxied setup
 app.use(cors({
-    origin: '*', // Allows all origins; since Nginx controls access, this is safe
+    origin: ['http://localhost:5500', 'http://127.0.0.1:5500'],
     credentials: true
 }));
-
 app.use(express.json());
 
 // Session validation middleware checking for JSON Web Tokens (OWASP A01 / A07)
