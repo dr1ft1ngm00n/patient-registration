@@ -29,9 +29,46 @@ The application runs inside an isolated virtual network managed by Docker Compos
 ### Prerequisites
 Make sure you have the following installed on your machine:
 * [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-* [Node.js](https://nodejs.org/) (used locally to generate cryptographic credentials)
+* [Node.js](https://nodejs.org/) (v18+ recommended)
 
 ### Step 1: Clone the Repository
 ```bash
-git clone [https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git](https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git)
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
 cd YOUR_REPO_NAME
+```
+
+### Step 2: Install Dependencies
+Install dependencies in both the root workspace and backend folders:
+```bash
+npm install
+```
+
+### Step 3: Run Database and Seed Data
+Start your Docker containers and initialize/seed the PostgreSQL database:
+```bash
+npm run setup
+```
+*(This starts the Postgres container via `docker compose`, pushes the Prisma schema, and seeds the master tables.)*
+
+### Step 4: Run the Development Server
+```bash
+npm run dev
+```
+
+### Step 5: Access the Frontend
+Open the frontend application in your browser:
+- If using VS Code, open with the **Live Server** extension (typically runs on `http://localhost:5500`).
+- The backend configuration allows CORS requests from `http://localhost:5500` for smooth local development.
+
+---
+
+## 💻 Available npm Scripts
+
+The following scripts can be run from the root directory:
+* `npm run setup`: Start PostgreSQL container, run Prisma schema push, and run DB seed script.
+* `npm run dev`: Start the Node.js Express server.
+* `npm run db:up`: Spin up database and pgAdmin containers in detached mode.
+* `npm run db:down`: Tear down database and pgAdmin containers.
+* `npm run prisma:push`: Push local schema changes directly to the database.
+* `npm run prisma:seed`: Populate master tables with initial data.
+* `npm run prisma:generate`: Re-generate the local Prisma Client.

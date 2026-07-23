@@ -11,6 +11,25 @@ async function main() {
     create: { id: 1, name: 'Male' },
   });
 
+  // Seed Role Options
+  await prisma.role.upsert({
+    where: { name: 'ADMIN' },
+    update: {},
+    create: { id: 1, name: 'ADMIN' },
+  });
+
+  await prisma.role.upsert({
+    where: { name: 'RECEPTIONIST' },
+    update: {},
+    create: { id: 2, name: 'RECEPTIONIST' },
+  });
+
+  await prisma.role.upsert({
+    where: { name: 'DOCTOR' },
+    update: {},
+    create: { id: 3, name: 'DOCTOR' },
+  });
+
   await prisma.genderMaster.upsert({
     where: { name: 'Female' },
     update: {},
@@ -21,6 +40,29 @@ async function main() {
     where: { name: 'Other' },
     update: {},
     create: { id: 3, name: 'Other' },
+  });
+
+  // Seed Default Staff User Accounts
+  await prisma.user.upsert({
+    where: { email: 'admin@gmail.com' },
+    update: {},
+    create: {
+      email: 'admin@gmail.com',
+      passwordHash: 'adminpassword',
+      fullName: 'System Administrator',
+      roleId: 1, // ADMIN
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: 'receptionist@hospital.com' },
+    update: {},
+    create: {
+      email: 'receptionist@hospital.com',
+      passwordHash: 'password123',
+      fullName: 'Default Receptionist',
+      roleId: 2, // RECEPTIONIST
+    },
   });
 
   console.log('✅ Seeding complete!');

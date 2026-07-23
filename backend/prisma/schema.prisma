@@ -38,17 +38,20 @@ model Patient {
   @@unique([firstName, lastName, dateOfBirth])
 }
 
-enum Role {
-  ADMIN
-  RECEPTIONIST
-  DOCTOR
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  users     User[]
 }
 
 model User {
   id           Int      @id @default(autoincrement())
   email        String   @unique
   passwordHash String
-  role         Role
+  roleId       Int
+  role         Role     @relation(fields: [roleId], references: [id])
   fullName     String
 
   createdAt    DateTime @default(now())

@@ -1,7 +1,19 @@
 {
+  "scripts": {
+    "dev": "node backend/server.js",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "prisma:generate": "npm --prefix backend run prisma:generate",
+    "prisma:push": "npm --prefix backend run prisma:push",
+    "prisma:seed": "npm --prefix backend run prisma:seed",
+    "setup": "npm run db:up && npm run prisma:push && npm run prisma:seed"
+  },
   "dependencies": {
     "connect-pg-simple": "^10.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "prisma": "^6.19.3"
   }
 }

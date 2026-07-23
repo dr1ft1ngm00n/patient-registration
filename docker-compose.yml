@@ -30,6 +30,39 @@ services:
     networks:
       - his_network
 
+  # --- Backend Express API Gateway ---
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: his_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://postgres:${DB_PASSWORD}@his_db:5432/patient_registration
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      SESSION_SECRET: ${SESSION_SECRET}
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+    networks:
+      - his_network
+
+  # --- Frontend Nginx Server ---
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: his_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - his_network
+
 networks:
   his_network:
     driver: bridge

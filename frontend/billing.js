@@ -74,7 +74,7 @@ async function loadBills() {
                 <tr>
                     <td><strong>🏥 ${patientDisplayName}</strong></td>
                     <td>${b.serviceDescription}</td>
-                    <td class="amount-highlight">$${Number(b.amount).toFixed(2)}</td>
+                    <td class="amount-highlight">₹${Number(b.amount).toFixed(2)}</td>
                     <td>
                         ${isPaid ? `
                             <span class="status-paid">✅ Paid</span>

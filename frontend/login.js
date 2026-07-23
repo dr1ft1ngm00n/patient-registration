@@ -28,8 +28,9 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
             msgDiv.textContent = 'Access granted. Redirecting to registration desk...';
             msgDiv.style.display = 'block';
             
-            // 🛡️ Lock in the temporary session authentication signature
-            localStorage.setItem('sessionToken', data.token);
+            // 🛡️ Lock in the temporary session authentication signature and role
+            localStorage.setItem('sessionToken', data.sessionToken);
+            localStorage.setItem('userRole', data.role || '');
 
             // Forward the active window viewport smoothly to the registration layout
             setTimeout(() => {

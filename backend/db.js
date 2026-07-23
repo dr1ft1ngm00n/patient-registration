@@ -83,17 +83,36 @@ async function searchPatients(query) {
   return patients.map(decryptPatientData);
 }
 
+// --- Role Methods ---
+async function getAllRoles() {
+  return prisma.role.findMany({ orderBy: { id: 'asc' } });
+}
+
+async function findRoleByName(name) {
+  return prisma.role.findUnique({ where: { name: name.toUpperCase() } });
+}
+
 // --- User Methods ---
-async function createUser({ email, password, role, fullName }) {
+async function createUser({ email, password, roleName, fullName }) {
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 
+  // Resolve the role record by name (e.g. 'RECEPTIONIST' -> id: 2)
+  const roleRecord = await findRoleByName(roleName || 'RECEPTIONIST');
+  if (!roleRecord) {
+    throw new Error(`Role '${roleName}' not found in the database.`);
+  }
+
   return prisma.user.create({
-    data: { email, passwordHash, role, fullName },
+    data: { email, passwordHash, roleId: roleRecord.id, fullName },
+    include: { role: true },
   });
 }
 
 async function findUserByEmail(email) {
-  return prisma.user.findUnique({ where: { email } });
+  return prisma.user.findUnique({
+    where: { email },
+    include: { role: true },
+  });
 }
 
 // --- Appointments ---
@@ -182,4 +201,6 @@ module.exports = {
   updateBillStatus,
   getAllBills,
   getGenderMaster,
+  getAllRoles,
+  findRoleByName,
 };

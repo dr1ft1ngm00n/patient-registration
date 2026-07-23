@@ -2,6 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
+const db = require('./db');
+
+const path = require('path');
 
 const prisma = new PrismaClient();
 const app = express();
@@ -14,13 +17,17 @@ const JWT_SECRET = process.env.JWT_SECRET || 'clinical-portal-jwt-super-secret-k
 // 🛡️ GLOBAL MIDDLEWARE CONFIGURATION
 // =========================================================================
 
+// Serve static frontend files (HTML/CSS/JS) directly for convenient local development
+app.use(express.static(path.join(__dirname, '../frontend')));
+
 // Configured to match secure local containers and cross-origin settings
-a// Simplest and most robust approach for a proxied setup
+// Simplest and most robust approach for a proxied setup
 app.use(cors({
     origin: [
         'http://localhost:5500', // Live Server
         'http://127.0.0.1:5500',
-        'http://localhost:3000'
+        'http://localhost:3000',
+        'http://localhost:3001'
     ],
     credentials: true
 }));
@@ -50,39 +57,54 @@ function authenticateToken(req, res, next) {
 // =========================================================================
 
 app.post('/api/register', async (req, res) => {
-    const { email, password, firstName, lastName } = req.body;
+    const { email, password, firstName, lastName, role } = req.body;
     try {
         if (!email || !password) {
             return res.status(400).json({ error: 'Email and password fields are strictly required.' });
         }
 
-        const newUser = await prisma.user.create({
-            data: { 
-                email, 
-                passwordHash: password, // For safety, in production always hash passwords!
-                role: 'RECEPTIONIST',   // Default fallback role
-                fullName: `${firstName} ${lastName}`.trim()
-            }
+        const newUser = await db.createUser({
+            email,
+            password,
+            roleName: role || 'RECEPTIONIST', // Default fallback role
+            fullName: `${firstName || ''} ${lastName || ''}`.trim()
         });
-        res.status(201).json({ message: 'User registered successfully!', userId: newUser.id });
+        res.status(201).json({ message: 'User registered successfully!', userId: newUser.id, role: newUser.role.name });
     } catch (err) {
-        res.status(400).json({ error: 'Registration failed. Email may already be in use.' });
+        console.error('Registration error:', err.message);
+        res.status(400).json({ error: err.message || 'Registration failed. Email may already be in use.' });
     }
 });
 
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     try {
-        const user = await prisma.user.findUnique({ where: { email } });
+        const user = await db.findUserByEmail(email);
         if (!user || user.passwordHash !== password) { 
             return res.status(401).json({ error: 'Invalid clinical credentials provided.' });
         }
 
         // Generate a cryptographically signed Session Token valid for 2 hours
-        const sessionToken = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '2h' });
-        res.json({ message: 'Authentication successful', sessionToken });
+        // Include role.name in the token payload for RBAC checks
+        const sessionToken = jwt.sign(
+            { userId: user.id, email: user.email, role: user.role.name },
+            JWT_SECRET,
+            { expiresIn: '2h' }
+        );
+        res.json({ message: 'Authentication successful', sessionToken, role: user.role.name });
     } catch (err) {
+        console.error('Login error:', err);
         res.status(500).json({ error: 'Internal gateway authentication error.' });
+    }
+});
+
+// GET: Fetch all available roles (public endpoint for registration dropdowns)
+app.get('/api/roles', async (req, res) => {
+    try {
+        const roles = await db.getAllRoles();
+        res.json(roles);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to retrieve roles.' });
     }
 });
 
